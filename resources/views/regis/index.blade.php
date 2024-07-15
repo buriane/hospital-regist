@@ -15,8 +15,7 @@
             <div class="flex items-center flex-shrink-0">
                 <div class="w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-sm sm:text-lg shadow relative group transition-colors duration-200 ease-linear"
                     :class="{ 'bg-blue text-white': showFormPasienLama || showFormPasienBaru || showBookingCode, 'bg-light-gray text-dark-grey': !showFormPasienLama && !showFormPasienBaru && !showBookingCode }">
-                    <div class="absolute inset-0 rounded-full border-[4px] sm:border-[6px] -m-[2px] sm:-m-1 transition-colors duration-200 ease-linear"
-                        :class="{ 'border-blue': true, 'border-gray-200': false }"></div>
+                    <div class="absolute inset-0 rounded-full border-[4px] sm:border-[6px] -m-[2px] sm:-m-1 transition-colors duration-200 ease-linear border-blue"></div>
                     <template x-if="!showFormPasienLama && !showFormPasienBaru && !showBookingCode" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                         <span>1</span>
                     </template>
@@ -24,8 +23,10 @@
                         <img src="{{ url('success.svg') }}" alt="Success" class="w-4 h-4 sm:w-6 sm:h-6">
                     </template>
                 </div>
-                <div class="w-36 sm:w-24 md:w-48 lg:w-96 h-2 sm:h-3 shadow transition-colors duration-200 ease-linear"
-                    :class="{ 'bg-blue': showFormPasienLama || showFormPasienBaru || showBookingCode, 'bg-gray-200': !showFormPasienLama && !showFormPasienBaru && !showBookingCode }"></div>
+                <div class="w-36 sm:w-24 md:w-48 lg:w-96 h-2 sm:h-3 shadow transition-colors duration-300 ease-linear overflow-hidden bg-gray-200">
+                    <div class="h-full bg-blue transition-all duration-300 ease-linear"
+                        :class="{ 'w-full': showFormPasienLama || showFormPasienBaru || showBookingCode, 'w-0': !showFormPasienLama && !showFormPasienBaru && !showBookingCode }"></div>
+                </div>
             </div>
             <div class="flex items-center flex-shrink-0">
                 <div class="w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-sm sm:text-lg shadow relative group transition-colors duration-200 ease-linear"
@@ -39,8 +40,10 @@
                         <img src="{{ url('success.svg') }}" alt="Success" class="w-4 h-4 sm:w-6 sm:h-6">
                     </template>
                 </div>
-                <div class="w-36 sm:w-24 md:w-48 lg:w-96 h-2 sm:h-3 shadow transition-colors duration-200 ease-linear"
-                    :class="{ 'bg-blue': showBookingCode, 'bg-gray-200': !showBookingCode }"></div>
+                <div class="w-36 sm:w-24 md:w-48 lg:w-96 h-2 sm:h-3 shadow transition-all duration-300 ease-linear overflow-hidden bg-gray-200">
+                    <div class="h-full bg-blue transition-all duration-300 ease-linear"
+                        :class="{ 'w-full': showBookingCode, 'w-0': !showBookingCode }"></div>
+                </div>
             </div>
             <div class="flex items-center flex-shrink-0">
                 <div class="w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-sm sm:text-lg shadow relative group transition-colors duration-200 ease-linear"
@@ -100,7 +103,8 @@
                     >
                         Kembali
                     </button>
-                    <button 
+                    <button
+                        @click="showFormPasienBaru = true; showFormPasienLama = false;"
                         type="button" 
                         class="bg-blue text-white px-4 py-2 rounded-xl hover:bg-blue/50 hover:text-white transition duration-200"
                     >
