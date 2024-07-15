@@ -4,57 +4,57 @@
 
 @section('content')
 <div x-data="{ showFormPasienLama: false, showFormPasienBaru: false, showBookingCode: false }">
-    <div class="flex justify-center items-center p-8 relative">
-        <h1 class="absolute text-light-gray text-2xl sm:text-3xl md:text-4xl font-bold z-10"><strong>Form Pendaftaran Online</strong></h1>
-        <img src="{{ url('pic.png') }}" alt="Gambar" class="relative">
+    <div class="flex justify-center items-center p-4 sm:p-8 relative">
+        <h1 class="absolute text-light-gray text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold z-10 text-center px-2"><strong>Form Pendaftaran Online</strong></h1>
+        <img src="{{ url('pic.png') }}" alt="Gambar" class="relative w-auto h-auto">
     </div>
 
     <div class="bg-light-blue p-4 sm:p-8 rounded-2xl mt-4 sm:mt-8 mx-auto mb-8 sm:mb-16 text-center max-w-[90%] sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl">
         {{-- Progress Bar --}}
-        <div class="flex justify-center items-center mb-4 sm:mb-8 mt-4 sm:mt-8">
+        <div class="flex justify-center items-center mb-3 sm:mb-8 mt-3 sm:mt-8">
             <div class="flex items-center flex-shrink-0">
-                <div class="w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-sm sm:text-lg shadow relative group transition-colors duration-200 ease-linear"
+                <div class="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-xs sm:text-lg shadow relative group transition-colors duration-200 ease-linear"
                     :class="{ 'bg-blue text-white': showFormPasienLama || showFormPasienBaru || showBookingCode, 'bg-light-gray text-dark-grey': !showFormPasienLama && !showFormPasienBaru && !showBookingCode }">
-                    <div class="absolute inset-0 rounded-full border-[4px] sm:border-[6px] -m-[2px] sm:-m-1 transition-colors duration-200 ease-linear border-blue"></div>
+                    <div class="absolute inset-0 rounded-full border-[3px] sm:border-[6px] -m-[1.5px] sm:-m-1 transition-colors duration-200 ease-linear border-blue"></div>
                     <template x-if="!showFormPasienLama && !showFormPasienBaru && !showBookingCode" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                         <span>1</span>
                     </template>
                     <template x-if="showFormPasienLama || showFormPasienBaru || showBookingCode" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                        <img src="{{ url('success.svg') }}" alt="Success" class="w-4 h-4 sm:w-6 sm:h-6">
+                        <img src="{{ url('success.svg') }}" alt="Success" class="w-3.5 h-3.5 sm:w-6 sm:h-6">
                     </template>
                 </div>
-                <div class="w-36 sm:w-24 md:w-48 lg:w-96 h-2 sm:h-3 shadow transition-colors duration-300 ease-linear overflow-hidden bg-gray-200">
+                <div class="w-20 sm:w-24 md:w-48 lg:w-96 h-1.5 sm:h-3 shadow transition-colors duration-300 ease-linear overflow-hidden bg-gray-200">
                     <div class="h-full bg-blue transition-all duration-300 ease-linear"
                         :class="{ 'w-full': showFormPasienLama || showFormPasienBaru || showBookingCode, 'w-0': !showFormPasienLama && !showFormPasienBaru && !showBookingCode }"></div>
                 </div>
             </div>
             <div class="flex items-center flex-shrink-0">
-                <div class="w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-sm sm:text-lg shadow relative group transition-colors duration-200 ease-linear"
+                <div class="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-xs sm:text-lg shadow relative group transition-colors duration-200 ease-linear"
                     :class="{ 'bg-blue text-white': showBookingCode, 'bg-light-gray text-dark-grey': !showBookingCode }">
-                    <div class="absolute inset-0 rounded-full border-[4px] sm:border-[6px] -m-[2px] sm:-m-1 transition-colors duration-200 ease-linear"
+                    <div class="absolute inset-0 rounded-full border-[3px] sm:border-[6px] -m-[1.5px] sm:-m-1 transition-colors duration-200 ease-linear"
                         :class="{ 'border-blue': showBookingCode || showFormPasienLama || showFormPasienBaru, 'border-gray-200': !showFormPasienLama && !showFormPasienBaru && !showBookingCode }"></div>
                     <template x-if="!showBookingCode" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                         <span>2</span>
                     </template>
                     <template x-if="showBookingCode" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                        <img src="{{ url('success.svg') }}" alt="Success" class="w-4 h-4 sm:w-6 sm:h-6">
+                        <img src="{{ url('success.svg') }}" alt="Success" class="w-3.5 h-3.5 sm:w-6 sm:h-6">
                     </template>
                 </div>
-                <div class="w-36 sm:w-24 md:w-48 lg:w-96 h-2 sm:h-3 shadow transition-all duration-300 ease-linear overflow-hidden bg-gray-200">
+                <div class="w-20 sm:w-24 md:w-48 lg:w-96 h-1.5 sm:h-3 shadow transition-all duration-300 ease-linear overflow-hidden bg-gray-200">
                     <div class="h-full bg-blue transition-all duration-300 ease-linear"
                         :class="{ 'w-full': showBookingCode, 'w-0': !showBookingCode }"></div>
                 </div>
             </div>
             <div class="flex items-center flex-shrink-0">
-                <div class="w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-sm sm:text-lg shadow relative group transition-colors duration-200 ease-linear"
+                <div class="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-xs sm:text-lg shadow relative group transition-colors duration-200 ease-linear"
                     :class="{ 'bg-blue text-white': showBookingCode, 'bg-light-gray text-dark-grey': !showBookingCode }">
-                    <div class="absolute inset-0 rounded-full border-[4px] sm:border-[6px] -m-[2px] sm:-m-1 transition-colors duration-200 ease-linear"
+                    <div class="absolute inset-0 rounded-full border-[3px] sm:border-[6px] -m-[1.5px] sm:-m-1 transition-colors duration-200 ease-linear"
                         :class="{ 'border-blue': showBookingCode, 'border-gray-200': !showBookingCode }"></div>
                     <template x-if="!showBookingCode" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                         <span>3</span>
                     </template>
                     <template x-if="showBookingCode" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                        <img src="{{ url('success.svg') }}" alt="Success" class="w-4 h-4 sm:w-6 sm:h-6">
+                        <img src="{{ url('success.svg') }}" alt="Success" class="w-3.5 h-3.5 sm:w-6 sm:h-6">
                     </template>
                 </div>
             </div>
@@ -177,7 +177,7 @@
                     <input type="number" id="nomor_kartu" name="nomor_kartu" class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6">
     
                     <label for="tanggal_kunjungan" class="text-base sm:text-lg mb-2 text-left w-full">
-                        Tanggal Kunjungan<span class="text-red-500 ml-1">*</span>
+                        Tanggal Kunjungan<span class="text-red-500 ml-1 text-xl sm:text-2xl font-bold">*</span>
                     </label>
                     <input type="date" id="tanggal_kunjungan" name="tanggal_kunjungan" class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6" required>
     
