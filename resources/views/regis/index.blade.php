@@ -5,7 +5,7 @@
 @section('content')
 <div x-data="{ showFormPasienLama: false, showFormPasienBaru: false, showBookingCode: false }">
     <div class="flex justify-center items-center p-4 sm:p-8 relative">
-        <h1 class="absolute text-light-gray text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold z-10 text-center px-2"><strong>Form Pendaftaran Online</strong></h1>
+        <h1 class="absolute text-light-gray text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold z-10 text-center px-2"><strong>Form Pendaftaran Online</strong></h1>
         <img src="{{ url('pic.png') }}" alt="Gambar" class="relative w-auto h-auto">
     </div>
 
@@ -81,50 +81,52 @@
         </div>
 
         <form x-show="showFormPasienLama" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-90" x-transition:enter-end="opacity-100 transform scale-100" action="" method="POST" class="mt-8 px-4 sm:px-0">
-        {{-- Form Pasien Lama --}}
-        <div class="flex flex-col sm:flex-row items-center justify-center">
-            <div class="w-full sm:w-1/6"></div>
-            <div class="w-full sm:w-5/6 flex flex-col items-start">
-                <label for="rekam_medis" class="text-base sm:text-lg mb-2 text-left w-full">
-                    Nomor Rekam Medis<span class="text-red-500 ml-1">*</span>
-                </label>
-                <input type="number" id="rekam_medis" name="rekam_medis" class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-4" required>
-                
-                <label for="tanggal_lahir" class="text-base sm:text-lg mb-2 text-left w-full">
-                    Tanggal Lahir<span class="text-red-500 ml-1">*</span>
-                </label>
-                <input type="date" id="tanggal_lahir" name="tanggal_lahir" class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6" required>
-                
-                <div class="w-full sm:w-5/6 flex justify-center space-x-4 mt-4">
-                    <button 
-                        @click="showFormPasienLama = false; showFormPasienBaru = false;" 
-                        type="button" 
-                        class="bg-light-gray text-dark-gray px-4 py-2 rounded-xl border-2 border-blue hover:bg-light-gray/30 hover:text-dark-gray/30 hover:border-blue/30 transition duration-200"
-                    >
-                        Kembali
-                    </button>
-                    <button
-                        @click="showFormPasienBaru = true; showFormPasienLama = false;"
-                        type="button" 
-                        class="bg-blue text-white px-4 py-2 rounded-xl hover:bg-blue/50 hover:text-white transition duration-200"
-                    >
-                        Berikutnya
-                    </button>
+            @csrf
+            {{-- Form Pasien Lama --}}
+            <div class="flex flex-col sm:flex-row items-center justify-center">
+                <div class="w-full sm:w-1/6"></div>
+                <div class="w-full sm:w-5/6 flex flex-col items-start">
+                    <label for="nomor_rm" class="text-base sm:text-lg mb-2 text-left w-full">
+                        Nomor Rekam Medis<span class="text-red-500 ml-1">*</span>
+                    </label>
+                    <input type="number" id="nomor_rm" name="nomor_rm" class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-4" required>
+                    
+                    <label for="tanggal_lahir" class="text-base sm:text-lg mb-2 text-left w-full">
+                        Tanggal Lahir<span class="text-red-500 ml-1">*</span>
+                    </label>
+                    <input type="date" id="tanggal_lahir" name="tanggal_lahir" class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6" required>
+                    
+                    <div class="w-full sm:w-5/6 flex justify-center space-x-4 mt-4">
+                        <button 
+                            @click="showFormPasienLama = false; showFormPasienBaru = false;" 
+                            type="button" 
+                            class="bg-light-gray text-dark-gray px-4 py-2 rounded-xl border-2 border-blue hover:bg-light-gray/30 hover:text-dark-gray/30 hover:border-blue/30 transition duration-200"
+                        >
+                            Kembali
+                        </button>
+                        <button
+                            @click="showFormPasienBaru = true; showFormPasienLama = false;"
+                            type="button" 
+                            class="bg-blue text-white px-4 py-2 rounded-xl hover:bg-blue/50 hover:text-white transition duration-200"
+                        >
+                            Berikutnya
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-        {{-- End Form Pasien Lama --}}
+            {{-- End Form Pasien Lama --}}
         </form>
 
         <form x-show="showFormPasienBaru" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-90" x-transition:enter-end="opacity-100 transform scale-100" action="" method="POST" class="mt-8 px-4 sm:px-0">
+            @csrf
             {{-- Form Pasien Baru --}}
             <div class="flex flex-col sm:flex-row items-center justify-center">
                 <div class="w-full sm:w-1/6"></div>
                 <div class="w-full sm:w-5/6 flex flex-col items-start">
-                    <label for="nama" class="text-base sm:text-lg mb-2 text-left w-full">
-                        Nama<span class="text-red-500 ml-1">*</span>
+                    <label for="nama_pasien" class="text-base sm:text-lg mb-2 text-left w-full">
+                        Nama Lengkap<span class="text-red-500 ml-1">*</span>
                     </label>
-                    <input type="text" id="nama" name="nama" class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-4" required>
+                    <input type="text" id="nama_pasien" name="nama_pasien" class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-4" required>
                     
                     <label for="tempat_lahir" class="text-base sm:text-lg mb-2 text-left w-full">
                         Tempat Lahir<span class="text-red-500 ml-1">*</span>
@@ -186,9 +188,9 @@
                     </label>
                     <select id="poliklinik" name="poliklinik" class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6" required>
                         <option value="" disabled selected>Pilih Poliklinik</option>
-                        <option value="poli_umum">Poliklinik Umum</option>
-                        <option value="poli_gigi">Poliklinik Gigi</option>
-                        <option value="poli_mata">Poliklinik Mata</option>
+                        @foreach($polikliniks as $poliklinik)
+                            <option value="{{ $poliklinik->id_poliklinik }}">{{ $poliklinik->nama_poliklinik }}</option>
+                        @endforeach
                     </select>
                     
                     <label for="dokter" class="text-base sm:text-lg mb-2 text-left w-full">
@@ -196,10 +198,13 @@
                     </label>
                     <select id="dokter" name="dokter" class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6" required>
                         <option value="" disabled selected>Pilih Dokter</option>
-                        <option value="dr_andi_08_12">dr. Andi | 08:00 - 12:00</option>
-                        <option value="dr_budi_13_17">dr. Budi | 13:00 - 17:00</option>
+                        @foreach($jadwal as $dokter)
+                            <option value="{{ $dokter->dokter->id_dokter }}" data-poliklinik="{{ $dokter->dokter->id_poliklinik }}">
+                                {{ $dokter->dokter->nama_dokter }} | {{ date('H:i', strtotime($dokter->jam_mulai)) }} - {{ date('H:i', strtotime($dokter->jam_selesai)) }}
+                            </option>
+                        @endforeach
                     </select>
-
+                    
                     <div class="w-full sm:w-5/6 flex justify-center space-x-4 mt-4">
                         <button @click="showFormPasienBaru = false" type="button" class="bg-light-gray text-dark-gray px-4 py-2 rounded-xl border-2 border-blue hover:bg-light-gray/30 hover:text-dark-gray/30 hover:border-blue/30 transition duration-200">Kembali</button>
                         <button 

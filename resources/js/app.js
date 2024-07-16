@@ -31,3 +31,26 @@ document.addEventListener('DOMContentLoaded', function() {
     dateInput.min = formatDate(tomorrow);
     dateInput.max = formatDate(nextWeek);
 });
+
+// Poli Dokter Filter
+document.addEventListener('DOMContentLoaded', function() {
+    const poliklinikSelect = document.getElementById('poliklinik');
+    const dokterSelect = document.getElementById('dokter');
+    const dokterOptions = dokterSelect.querySelectorAll('option:not([value=""])');
+
+    poliklinikSelect.addEventListener('change', function() {
+        const selectedPoliklinik = this.value;
+        
+        dokterOptions.forEach(option => {
+            if (option.dataset.poliklinik === selectedPoliklinik) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+
+        dokterSelect.value = '';
+    });
+
+    poliklinikSelect.dispatchEvent(new Event('change'));
+});
