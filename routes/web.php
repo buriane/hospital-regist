@@ -10,6 +10,8 @@ use App\Http\Controllers\CutiDokterController;
 
 Route::get('/', [RegistrasiController::class, 'index'])->name('regis.index');
 
+Route::get('/check-patient', 'RegistrasiController@checkPatient');
+
 Route::get('/jadwal', [JadwalDokterController::class, 'index'])->name('jadwal.index');
 
 Route::get('/info', [JadwalDokterController::class, 'indexinfo'])->name('info.indexinfo');

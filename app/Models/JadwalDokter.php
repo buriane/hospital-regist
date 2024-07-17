@@ -17,6 +17,7 @@ class JadwalDokter extends Model
         'tanggal',
         'jam_mulai',
         'jam_selesai',
+        'kuota',
     ];
 
     public function dokter()
