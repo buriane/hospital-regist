@@ -28,6 +28,9 @@ class DokterResource extends Resource
 
     protected static ?string $navigationLabel = 'Data Dokter';
 
+    protected static ?int $navigationSort = 0;
+
+
     public static function form(Form $form): Form
     {
         return $form
@@ -49,16 +52,6 @@ class DokterResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('no')->state(
-                    static function (HasTable $livewire, stdClass $rowLoop): string {
-                        return (string) (
-                            $rowLoop->iteration +
-                            ($livewire->getTableRecordsPerPage() * (
-                                $livewire->getTablePage() - 1
-                            ))
-                        );
-                    }
-                ),   
                 TextColumn::make('nama_dokter')
                     ->label('Nama Dokter')
                     ->searchable(),
@@ -68,7 +61,8 @@ class DokterResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('id_poliklinik')
-                    ->label('Poliklinik')
+                    ->label('Filter Poliklinik')
+                    ->placeholder('Pilih Poliklinik')
                     ->relationship('poliklinik', 'nama_poliklinik')
             ])
             ->actions([

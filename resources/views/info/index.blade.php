@@ -18,20 +18,43 @@
             </thead>
             <tbody>
                 @foreach($polikliniks as $poliklinik)
-                    <tr class="bg-blue text-light-gray">
-                        <td colspan="3" class="p-2 sm:p-3 font-bold text-left whitespace-nowrap">{{ strtoupper($poliklinik->nama_poliklinik) }}</td>
+                    @php
+                        $hasDoctorSchedules = $poliklinik->dokter->flatMap->jadwalDokters->isNotEmpty();
+                        $hasAvailableQuota = $poliklinik->dokter->flatMap->jadwalDokters->where('kuota', '>', 0)->isNotEmpty();
+                    @endphp
+                    <tr>
+                        <td colspan="3" class="p-2 sm:p-3 font-bold text-left text-light-gray whitespace-nowrap bg-blue border-b-2 border-light-blue">
+                            {{ strtoupper($poliklinik->nama_poliklinik) }}
+                            @if(!$hasDoctorSchedules)
+                                <span class="ml-2 px-2 py-1 text-xs font-semibold bg-red-500 text-white rounded-full animate-pulse">
+                                    Tidak ada jadwal dokter yang tersedia
+                                </span>
+                            @elseif(!$hasAvailableQuota)
+                                <span class="ml-2 px-2 py-1 text-xs font-semibold bg-yellow-500 text-white rounded-full animate-pulse">
+                                    Kuota sudah penuh
+                                </span>
+                            @endif
+                        </td>
                     </tr>
-                    @foreach($poliklinik->dokter as $dokter)
-                        @foreach($dokter->jadwalDokters as $jadwal)
-                            <tr>
-                                <td class="border border-gray-300 p-2 sm:p-3 pl-10 text-left whitespace-nowrap">{{ $dokter->nama_dokter }}</td>
-                                <td class="border border-gray-300 p-2 sm:p-3 text-center whitespace-nowrap">
-                                    {{ date('H:i', strtotime($jadwal->jam_mulai)) }} - {{ date('H:i', strtotime($jadwal->jam_selesai)) }}
-                                </td>
-                                <td class="border border-gray-300 p-2 sm:p-3 text-center font-bold whitespace-nowrap"><strong>{{ $jadwal->kuota }}</strong></td>
-                            </tr>
+                    @if($hasDoctorSchedules)
+                        @foreach($poliklinik->dokter as $dokter)
+                            @foreach($dokter->jadwalDokters as $jadwal)
+                                <tr>
+                                    <td class="border border-gray-300 p-2 sm:p-3 pl-10 text-left whitespace-nowrap">{{ $dokter->nama_dokter }}</td>
+                                    <td class="border border-gray-300 p-2 sm:p-3 text-center whitespace-nowrap">
+                                        {{ date('H:i', strtotime($jadwal->jam_mulai)) }} - {{ date('H:i', strtotime($jadwal->jam_selesai)) }}
+                                    </td>
+                                    <td class="border border-gray-300 p-2 sm:p-3 text-center font-bold whitespace-nowrap">
+                                        @if($jadwal->kuota > 0)
+                                            <strong>{{ $jadwal->kuota }}</strong>
+                                        @else
+                                            <span class="text-red-500 font-bold"><strong>Kuota Penuh</strong></span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
                         @endforeach
-                    @endforeach
+                    @endif
                 @endforeach
             </tbody>
         </table>

@@ -200,7 +200,7 @@
                         <option value="" disabled selected>Pilih Dokter</option>
                         @foreach($jadwal as $dokter)
                             <option value="{{ $dokter->dokter->id_dokter }}" data-poliklinik="{{ $dokter->dokter->id_poliklinik }}">
-                                {{ $dokter->dokter->nama_dokter }} | {{ date('H:i', strtotime($dokter->jam_mulai)) }} - {{ date('H:i', strtotime($dokter->jam_selesai)) }}
+                                {{ $dokter->dokter->nama_dokter }} - {{ date('H:i', strtotime($dokter->jam_mulai)) }} s/d {{ date('H:i', strtotime($dokter->jam_selesai)) }}
                             </option>
                         @endforeach
                     </select>

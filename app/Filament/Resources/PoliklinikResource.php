@@ -41,16 +41,6 @@ class PoliklinikResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('no')->state(
-                    static function (HasTable $livewire, stdClass $rowLoop): string {
-                        return (string) (
-                            $rowLoop->iteration +
-                            ($livewire->getTableRecordsPerPage() * (
-                                $livewire->getTablePage() - 1
-                            ))
-                        );
-                    }
-                ),   
                 TextColumn::make('nama_poliklinik')->label('Nama Poliklinik')->searchable(),
             ])
             ->filters([

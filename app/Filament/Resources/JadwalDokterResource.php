@@ -23,6 +23,8 @@ use Filament\Tables\Contracts\HasTable;
 use stdClass;
 use Carbon\Carbon;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Columns\BadgeColumn;
 
 class JadwalDokterResource extends Resource
 {
@@ -31,6 +33,14 @@ class JadwalDokterResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
     protected static ?string $navigationLabel = 'Data Jadwal Dokter';
+
+    protected static ?int $navigationSort = -1;
+
+    private static function determineShift($jamMulai)
+    {
+        $hour = Carbon::parse($jamMulai)->hour;
+        return $hour < 12 ? 'Pagi' : 'Sore';
+    }
 
     public static function form(Form $form): Form
     {
@@ -65,7 +75,7 @@ class JadwalDokterResource extends Resource
                         TextInput::make('kuota')
                             ->numeric()
                             ->required()
-                            ->minValue(1),
+                            ->rules(['min:1'])
                     ])->columns(2),
             ]);
     }
@@ -74,51 +84,91 @@ class JadwalDokterResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('no')->state(
-                    static function (HasTable $livewire, stdClass $rowLoop): string {
-                        return (string) (
-                            $rowLoop->iteration +
-                            ($livewire->getTableRecordsPerPage() * (
-                                $livewire->getTablePage() - 1
-                            ))
-                        );
-                    }
-                ),
                 TextColumn::make('dokter.nama_dokter')
                     ->label('Nama Dokter')
                     ->searchable(),
                 TextColumn::make('tanggal')
                     ->label('Tanggal')
-                    ->searchable()
-                    ->sortable(),
+                    ->date() 
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('hari')
                     ->label('Hari')
                     ->searchable()
                     ->sortable(),
+                BadgeColumn::make('shift')
+                    ->label('Shift')
+                    ->getStateUsing(fn ($record) => self::determineShift($record->jam_mulai))
+                    ->colors([
+                        'warning' => 'Pagi',
+                        'primary' => 'Sore',
+                    ])
+                    ->icons([
+                        'heroicon-o-sun' => 'Pagi',
+                        'heroicon-o-moon' => 'Sore',
+                    ]),
                 TextColumn::make('jam_mulai')
                     ->label('Jam Mulai')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('jam_selesai')
                     ->label('Jam Selesai')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('kuota')
                     ->label('Kuota')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
             ])
             ->filters([
+                Filter::make('tanggal')
+                    ->form([
+                        DatePicker::make('tanggal')
+                            ->label('Filter Tanggal'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['tanggal'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('tanggal', $date),
+                        );
+                    }),
+                SelectFilter::make('shift')
+                    ->label('Filter Shift')
+                    ->placeholder('Pilih Shift')
+                    ->options([
+                        'Pagi' => 'Pagi',
+                        'Sore' => 'Sore',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        return $query->when($data['value'], function ($query, $shift) {
+                            if ($shift === 'Pagi') {
+                                return $query->whereTime('jam_mulai', '<', '12:00:00');
+                            } elseif ($shift === 'Sore') {
+                                return $query->whereTime('jam_mulai', '>=', '12:00:00');
+                            }
+                        });
+                    }),
+                SelectFilter::make('id_dokter')
+                    ->label('Filter Dokter')
+                    ->relationship('dokter', 'nama_dokter')
+                    ->multiple()
+                    ->preload()
+                    ->placeholder('Pilih Dokter')
+                    ->searchable(),
                 SelectFilter::make('hari')
-                ->label('Pilih Hari')
-                ->options([
-                    'Senin' => 'Senin',
-                    'Selasa' => 'Selasa',
-                    'Rabu' => 'Rabu',
-                    'Kamis' => 'Kamis',
-                    'Jumat' => 'Jumat',
-                    'Sabtu' => 'Sabtu',
-                    'Minggu' => 'Minggu',
-                ])
-                ->multiple()
-                ->searchable(), 
+                    ->label('Filter Hari')
+                    ->options([
+                        'Senin' => 'Senin',
+                        'Selasa' => 'Selasa',
+                        'Rabu' => 'Rabu',
+                        'Kamis' => 'Kamis',
+                        'Jumat' => 'Jumat',
+                        'Sabtu' => 'Sabtu',
+                        'Minggu' => 'Minggu',
+                    ])
+                    ->multiple()
+                    ->placeholder('Pilih Hari')
+                    ->searchable(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

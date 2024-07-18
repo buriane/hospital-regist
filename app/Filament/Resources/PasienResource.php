@@ -21,6 +21,9 @@ use Filament\Forms\Components\Radio;
 use Illuminate\Validation\Rule;
 use Filament\Tables\Contracts\HasTable;
 use stdClass;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Filters\SelectFilter;
+
 
 class PasienResource extends Resource
 {
@@ -46,7 +49,6 @@ class PasienResource extends Resource
                             Rule::unique('pasiens', 'nomor_rm')->ignore($record)
                         )
                         ->validationAttribute('Nomor RM')
-                        ->required()
                         ->label('Nomor Rekam Medis')
                         ->extraInputAttributes(['onInput' => 'if(this.value.length > 6) this.value = this.value.slice(0, 6);']),
                         TextInput::make('nama_pasien')->required(),
@@ -85,28 +87,43 @@ class PasienResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('no')->state(
-                    static function (HasTable $livewire, stdClass $rowLoop): string {
-                        return (string) (
-                            $rowLoop->iteration +
-                            ($livewire->getTableRecordsPerPage() * (
-                                $livewire->getTablePage() - 1
-                            ))
-                        );
-                    }
-                ),                
-                TextColumn::make('nomor_rm')->label('Nomor RM')->searchable(),
+                BadgeColumn::make('status_pasien')
+                    ->label('Status')
+                    ->colors([
+                        'success' => 'Baru',
+                        'primary' => 'Lama',
+                    ])
+                    ->state(function ($record) {
+                        return $record->nomor_rm ? 'Lama' : 'Baru';
+                    }),
+                TextColumn::make('nomor_rm')
+                    ->label('Nomor RM')
+                    ->searchable(),
                 TextColumn::make('nama_pasien')->label('Nama Pasien')->searchable(),
-                TextColumn::make('tempat_lahir')->label('Tempat Lahir'),
-                TextColumn::make('tanggal_lahir')->label('Tanggal Lahir'),
-                TextColumn::make('jenis_kelamin')->label('Jenis Kelamin'),
-                TextColumn::make('alamat')->label('Alamat')->wrap()->extraAttributes(['style' => 'width: 300px;']),
-                TextColumn::make('nomor_telepon')->label('Nomor Telepon'),
-                TextColumn::make('email')->label('Email'),
-                TextColumn::make('nomor_kartu')->label('Nomor Kartu'),
+                TextColumn::make('tempat_lahir')->label('Tempat Lahir')->searchable(),
+                TextColumn::make('tanggal_lahir')->label('Tanggal Lahir')->date()->searchable(),
+                TextColumn::make('jenis_kelamin')->label('Jenis Kelamin')->searchable(),
+                TextColumn::make('alamat')->label('Alamat')->wrap()->extraAttributes(['style' => 'width: 300px;'])->searchable(),
+                TextColumn::make('nomor_telepon')->label('Nomor Telepon')->searchable(),
+                TextColumn::make('email')->label('Email')->searchable(),
+                TextColumn::make('nomor_kartu')->label('Nomor Kartu')->searchable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('status_pasien')
+                    ->label('Filter Status')
+                    ->placeholder('Pilih Status')
+                    ->options([
+                        'Baru' => 'Baru',
+                        'Lama' => 'Lama',
+                    ])
+                    ->query(function ($query, array $data) {
+                        $value = $data['value'] ?? null;
+                        if ($value === 'Baru') {
+                            return $query->whereNull('nomor_rm');
+                        } elseif ($value === 'Lama') {
+                            return $query->whereNotNull('nomor_rm');
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
