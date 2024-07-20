@@ -75,6 +75,9 @@ class RegistrasiResource extends Resource
                             ->relationship('poliklinik', 'nama_poliklinik')
                             ->required()
                             ->live()
+                            ->searchable()
+                            ->preload()
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->nama_poliklinik}")
                             ->disabled(fn ($livewire) => $livewire instanceof Pages\EditRegistrasi),
                         Select::make('id_dokter')
                             ->label('Dokter')
@@ -164,7 +167,7 @@ class RegistrasiResource extends Resource
                     ->searchable(),
                 TextColumn::make('kode_booking')
                     ->searchable(),
-                    TextColumn::make('status')
+                TextColumn::make('status')
                     ->label('Status')
                     ->icon(fn (string $state): string => match ($state) {
                         'Pending' => 'heroicon-o-clock',
@@ -194,15 +197,6 @@ class RegistrasiResource extends Resource
                     ->preload()
                     ->placeholder('Pilih Dokter')
                     ->searchable(),
-                SelectFilter::make('status')
-                    ->options([
-                        'Pending' => 'Pending',
-                        'Confirmed' => 'Confirmed',
-                        'Canceled' => 'Canceled',
-                    ])
-                    ->label('Filter Status Registrasi')
-                    ->placeholder('Pilih Status Registrasi')
-                    ->multiple(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

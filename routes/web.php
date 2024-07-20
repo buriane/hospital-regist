@@ -9,8 +9,10 @@ use App\Http\Controllers\PasienController;
 use App\Http\Controllers\CutiDokterController;
 
 Route::get('/', [RegistrasiController::class, 'index'])->name('regis.index');
+Route::post('/', [RegistrasiController::class, 'store'])->name('regis.store');
+Route::get('/jadwal/{tgl}', [RegistrasiController::class, 'jadwal'])->name('regis.jadwal');
 
-Route::get('/check-patient', 'RegistrasiController@checkPatient');
+Route::get('/check-patient', [RegistrasiController::class, 'checkPatient'])->name('regis.check');
 
 Route::get('/jadwal', [JadwalDokterController::class, 'index'])->name('jadwal.index');
 

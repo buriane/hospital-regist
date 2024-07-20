@@ -25,6 +25,7 @@ use Carbon\Carbon;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Columns\BadgeColumn;
+use Filament\Forms\Components\Repeater;
 
 class JadwalDokterResource extends Resource
 {
@@ -51,7 +52,10 @@ class JadwalDokterResource extends Resource
                         Select::make('id_dokter')
                             ->label('Dokter')
                             ->relationship('dokter', 'nama_dokter')
-                            ->required(),
+                            ->required()
+                            ->searchable()
+                            ->preload()
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->nama_dokter}"),
                         DatePicker::make('tanggal')
                             ->required()
                             ->reactive()
@@ -76,8 +80,54 @@ class JadwalDokterResource extends Resource
                             ->numeric()
                             ->required()
                             ->rules(['min:1'])
-                    ])->columns(2),
+                    ])->columns(1),
             ]);
+    }
+
+    public static function getCreateFormSchema(): array
+    {
+        return [
+            Card::make()
+                ->schema([
+                    Select::make('id_dokter')
+                        ->label('Dokter')
+                        ->relationship('dokter', 'nama_dokter')
+                        ->required()
+                        ->searchable()
+                        ->preload()
+                        ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->nama_dokter}"),
+                    Repeater::make('jadwal')
+                        ->schema([
+                            DatePicker::make('tanggal')
+                                ->required()
+                                ->reactive()
+                                ->afterStateUpdated(function ($state, callable $set) {
+                                    if ($state) {
+                                        $dayName = Carbon::parse($state)->locale('id')->dayName;
+                                        $set('hari', ucfirst($dayName));
+                                    }
+                                }),
+                            TextInput::make('hari')
+                                ->label('Hari')
+                                ->disabled()
+                                ->dehydrated(true),
+                            Grid::make(2)
+                                ->schema([
+                                    TimePicker::make('jam_mulai')
+                                        ->required(),
+                                    TimePicker::make('jam_selesai')
+                                        ->required(),
+                                ]),
+                            TextInput::make('kuota')
+                                ->numeric()
+                                ->required()
+                                ->rules(['min:1'])
+                        ])
+                        ->columns(2)
+                        ->defaultItems(1)
+                        ->createItemButtonLabel('Tambah Jadwal')
+                ])->columns(1),
+        ];
     }
 
     public static function table(Table $table): Table
@@ -154,20 +204,6 @@ class JadwalDokterResource extends Resource
                     ->multiple()
                     ->preload()
                     ->placeholder('Pilih Dokter')
-                    ->searchable(),
-                SelectFilter::make('hari')
-                    ->label('Filter Hari')
-                    ->options([
-                        'Senin' => 'Senin',
-                        'Selasa' => 'Selasa',
-                        'Rabu' => 'Rabu',
-                        'Kamis' => 'Kamis',
-                        'Jumat' => 'Jumat',
-                        'Sabtu' => 'Sabtu',
-                        'Minggu' => 'Minggu',
-                    ])
-                    ->multiple()
-                    ->placeholder('Pilih Hari')
                     ->searchable(),
             ])
             ->actions([

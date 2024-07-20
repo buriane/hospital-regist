@@ -49,9 +49,9 @@ class PasienResource extends Resource
                             Rule::unique('pasiens', 'nomor_rm')->ignore($record)
                         )
                         ->validationAttribute('Nomor RM')
-                        ->label('Nomor Rekam Medis')
+                        ->label('Nomor rekam medis')
                         ->extraInputAttributes(['onInput' => 'if(this.value.length > 6) this.value = this.value.slice(0, 6);']),
-                        TextInput::make('nama_pasien')->required(),
+                        TextInput::make('nama_pasien')->label('Nama lengkap')->required(),
                         TextInput::make('tempat_lahir')->required(),
                         DatePicker::make('tanggal_lahir')->required(),
                         Radio::make('jenis_kelamin')
@@ -99,7 +99,7 @@ class PasienResource extends Resource
                 TextColumn::make('nomor_rm')
                     ->label('Nomor RM')
                     ->searchable(),
-                TextColumn::make('nama_pasien')->label('Nama Pasien')->searchable(),
+                TextColumn::make('nama_pasien')->label('Nama Lengkap')->searchable(),
                 TextColumn::make('tempat_lahir')->label('Tempat Lahir')->searchable(),
                 TextColumn::make('tanggal_lahir')->label('Tanggal Lahir')->date()->searchable(),
                 TextColumn::make('jenis_kelamin')->label('Jenis Kelamin')->searchable(),
@@ -109,21 +109,7 @@ class PasienResource extends Resource
                 TextColumn::make('nomor_kartu')->label('Nomor Kartu')->searchable(),
             ])
             ->filters([
-                SelectFilter::make('status_pasien')
-                    ->label('Filter Status')
-                    ->placeholder('Pilih Status')
-                    ->options([
-                        'Baru' => 'Baru',
-                        'Lama' => 'Lama',
-                    ])
-                    ->query(function ($query, array $data) {
-                        $value = $data['value'] ?? null;
-                        if ($value === 'Baru') {
-                            return $query->whereNull('nomor_rm');
-                        } elseif ($value === 'Lama') {
-                            return $query->whereNotNull('nomor_rm');
-                        }
-                    }),
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

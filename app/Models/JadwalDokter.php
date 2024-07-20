@@ -13,8 +13,8 @@ class JadwalDokter extends Model
     protected $guarded = ['id_jadwal_dokter'];
     protected $fillable = [
         'id_dokter',
-        'hari',
         'tanggal',
+        'hari',
         'jam_mulai',
         'jam_selesai',
         'kuota',

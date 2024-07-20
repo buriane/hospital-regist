@@ -1,4 +1,4 @@
-<nav class="bg-light-gray">
+<nav class="bg-light-gray p-2">
     <div class="container mx-auto px-2 sm:px-4 py-3 sm:py-2">
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
             <div class="flex justify-center mb-8 sm:mb-0 w-full sm:w-auto">

@@ -64,6 +64,8 @@ class DokterResource extends Resource
                     ->label('Filter Poliklinik')
                     ->placeholder('Pilih Poliklinik')
                     ->relationship('poliklinik', 'nama_poliklinik')
+                    ->multiple()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

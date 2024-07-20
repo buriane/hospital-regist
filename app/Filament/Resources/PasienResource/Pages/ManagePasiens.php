@@ -5,6 +5,8 @@ namespace App\Filament\Resources\PasienResource\Pages;
 use App\Filament\Resources\PasienResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
+use Filament\Resources\Components\Tab;
+use Illuminate\Database\Eloquent\Builder;
 
 class ManagePasiens extends ManageRecords
 {
@@ -22,4 +24,14 @@ class ManagePasiens extends ManageRecords
         return 'Data Pasien';
     }
 
+    public function getTabs(): array
+    {
+        return [
+            'all' => Tab::make('All Pasien'),
+            'baru' => Tab::make('Pasien Baru')
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('nomor_rm')),
+            'lama' => Tab::make('Pasien Lama')
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('nomor_rm')),
+        ];
+    }
 }
