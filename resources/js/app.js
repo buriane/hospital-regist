@@ -15,26 +15,21 @@ Alpine.start();
 document.addEventListener("DOMContentLoaded", function () {
     const dateInput = document.getElementById("tanggal_kunjungan_baru");
     const today = new Date();
-    today.setHours(0, 0, 0, 0); 
-    const tomorrow = new Date(today);
+    const tomorrow = new Date();
+    const nextWeek = new Date();
+
     tomorrow.setDate(today.getDate() + 1);
-    const lastDay = new Date(today);
-    lastDay.setDate(today.getDate() + 8);
+    nextWeek.setDate(today.getDate() + 7);
 
     const formatDate = (date) => {
-        return date.toISOString().split('T')[0];
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
     };
 
     dateInput.min = formatDate(tomorrow);
-    dateInput.max = formatDate(lastDay);
-
-    dateInput.addEventListener("input", function() {
-        const selectedDate = new Date(this.value + "T00:00:00");
-        if (selectedDate < tomorrow || selectedDate >= lastDay) {
-            this.value = "";
-            alert("Mohon pilih tanggal antara besok atau 7 hari ke depan.");
-        }
-    });
+    dateInput.max = formatDate(nextWeek);
 });
 
 // Poli Dokter Filter
@@ -48,16 +43,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateDokterOptions() {
         dokterOptions.forEach((option) => {
-            if (option.dataset.poliklinik === selectedPoliklinik && 
-                option.dataset.tanggal === selectedTanggal && 
-                parseInt(option.dataset.kuota) > 0) {
+            if (
+                option.dataset.poliklinik === selectedPoliklinik &&
+                option.dataset.tanggal === selectedTanggal &&
+                parseInt(option.dataset.kuota) > 0
+            ) {
                 option.style.display = "";
             } else {
                 option.style.display = "none";
             }
         });
 
-        // Reset pilihan dokter
         dokterSelect.value = "";
     }
 
@@ -71,51 +67,24 @@ document.addEventListener("DOMContentLoaded", function () {
         updateDokterOptions();
     });
 
-    // Initial update
-    updateDokterOptions();
+    poliklinikSelect.dispatchEvent(new Event("change"));
+    tanggal.dispatchEvent(new Event("change"));
 });
 
-// Check Patient
-document.addEventListener('DOMContentLoaded', function() {
-    const nomor_rm = document.getElementById('nomor_rm');
-    const tanggal_lahir = document.getElementById('tanggal_lahir');
-    const patientData = document.getElementById('patientData');
+// Load Content
+document.addEventListener("DOMContentLoaded", function () {
+    const input_id = document.getElementById("id_pasien");
+    var input_value = input_id.value;
 
-    nomor_rm.addEventListener('input', function() {
-        if (this.value.length > 6) {
-            this.value = this.value.slice(0, 6);
-        }
+    input_id.addEventListener("onchange", function () {
+        input_value = this.value;
+        // document.querySelector("[x-data]").__x.$data.id_pasien = input_value;
+        // console.log(Alpine.data("id_pasien", input_value));
+        Alpine.data("id_pasien", input_value);
+
+        // console.log(Alpine.data("id_pasien", input_value));
+        console.log(input_value);
     });
 
-    function checkPatient() {
-        if (nomor_rm.value && tanggal_lahir.value) {
-            fetch(`/check-patient?nomor_rm=${nomor_rm.value}&tanggal_lahir=${tanggal_lahir.value}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.exists) {
-                        // patientData.classList.remove('hidden');
-                        document.getElementById('id_pasien').value = data.id_pasien;
-                        document.getElementById('nama_pasien_baru').value = data.nama_pasien;
-                        document.getElementById('tempat_lahir_baru').value = data.tempat_lahir;
-                        document.getElementById('tanggal_lahir_baru').value = data.tanggal_lahir;
-                        if (data.jenis_kelamin == "Perempuan") {
-                            document.querySelector('input[name="jenis_kelamin"][value="Perempuan"]')
-                                .checked = true;
-                        } else {
-                            document.querySelector('input[name="jenis_kelamin"][value="Laki-laki"]')
-                                .checked = true;
-
-                        }
-                        document.getElementById('alamat_baru').value = data.alamat;
-                        document.getElementById('nomor_telepon_baru').value = data.nomor_telepon;
-                        document.getElementById('email_baru').value = data.email;
-                        document.getElementById('nomor_kartu_baru').value = data.nomor_kartu;
-                    } else {
-                        // patientData.classList.add('hidden');
-                    }
-                });
-        }
-    }
-    nomor_rm.addEventListener('blur', checkPatient);
-    tanggal_lahir.addEventListener('change', checkPatient);
+    input_id.dispatchEvent(new Event("onchange"));
 });

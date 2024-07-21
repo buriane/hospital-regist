@@ -15,46 +15,45 @@
             class="bg-light-blue p-4 sm:p-8 rounded-2xl mt-4 sm:mt-8 mx-auto mb-8 sm:mb-16 text-center max-w-[90%] sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl">
 
             @if (isset($kode)){{-- Progress Bar --}}
-            <div class="flex justify-center items-center mb-3 sm:mb-8 mt-3 sm:mt-8">
-                <div class="flex items-center flex-shrink-0">
-                    <div class="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-xs sm:text-lg shadow relative group bg-blue text-white"
-                        >
+                <div class="flex justify-center items-center mb-3 sm:mb-8 mt-3 sm:mt-8">
+                    <div class="flex items-center flex-shrink-0">
                         <div
-                            class="absolute inset-0 rounded-full border-[3px] sm:border-[6px] -m-[1.5px] sm:-m-1 border-blue">
-                        </div>
+                            class="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-xs sm:text-lg shadow relative group bg-blue text-white">
+                            <div
+                                class="absolute inset-0 rounded-full border-[3px] sm:border-[6px] -m-[1.5px] sm:-m-1 border-blue">
+                            </div>
                             <img src="{{ url('success.svg') }}" alt="Success" class="w-3.5 h-3.5 sm:w-6 sm:h-6">
+                        </div>
+                        <div
+                            class="w-20 sm:w-24 md:w-48 lg:w-96 h-1.5 sm:h-3 shadow transition-colors duration-300 ease-linear overflow-hidden bg-gray-200">
+                            <div class="h-full bg-blue transition-all duration-300 ease-linear">
+                            </div>
+                        </div>
                     </div>
-                    <div
-                        class="w-20 sm:w-24 md:w-48 lg:w-96 h-1.5 sm:h-3 shadow transition-colors duration-300 ease-linear overflow-hidden bg-gray-200">
-                        <div class="h-full bg-blue transition-all duration-300 ease-linear"
-                            >
+                    <div class="flex items-center flex-shrink-0">
+                        <div
+                            class="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-xs sm:text-lg shadow relative group bg-blue text-white">
+                            <div
+                                class="absolute inset-0 rounded-full border-[3px] sm:border-[6px] -m-[1.5px] sm:-m-1 border-blue">
+                            </div>
+                            <img src="{{ url('success.svg') }}" alt="Success" class="w-3.5 h-3.5 sm:w-6 sm:h-6">
+                        </div>
+                        <div
+                            class="w-20 sm:w-24 md:w-48 lg:w-96 h-1.5 sm:h-3 shadow transition-all duration-300 ease-linear overflow-hidden bg-gray-200">
+                            <div class="h-full bg-blue transition-all duration-300 ease-linear"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-center flex-shrink-0">
+                        <div
+                            class="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-xs sm:text-lg shadow relative group bg-blue text-white">
+                            <div
+                                class="absolute inset-0 rounded-full border-[3px] sm:border-[6px] -m-[1.5px] sm:-m-1 border-blue">
+                            </div>
+                            <img src="{{ url('success.svg') }}" alt="Success" class="w-3.5 h-3.5 sm:w-6 sm:h-6">
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center flex-shrink-0">
-                    <div class="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-xs sm:text-lg shadow relative group bg-blue text-white"
-                        >
-                        <div class="absolute inset-0 rounded-full border-[3px] sm:border-[6px] -m-[1.5px] sm:-m-1 border-blue"
-                            >
-                        </div>
-                            <img src="{{ url('success.svg') }}" alt="Success" class="w-3.5 h-3.5 sm:w-6 sm:h-6">
-                    </div>
-                    <div
-                        class="w-20 sm:w-24 md:w-48 lg:w-96 h-1.5 sm:h-3 shadow transition-all duration-300 ease-linear overflow-hidden bg-gray-200">
-                        <div class="h-full bg-blue transition-all duration-300 ease-linear"
-                            ></div>
-                    </div>
-                </div>
-                <div class="flex items-center flex-shrink-0">
-                    <div class="w-7 h-7 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-xs sm:text-lg shadow relative group bg-blue text-white"
-                        >
-                        <div class="absolute inset-0 rounded-full border-[3px] sm:border-[6px] -m-[1.5px] sm:-m-1 border-blue"
-                            ></div>
-                            <img src="{{ url('success.svg') }}" alt="Success" class="w-3.5 h-3.5 sm:w-6 sm:h-6">
-                    </div>
-                </div>
-            </div>
-            {{-- End Progress Bar --}}
+                {{-- End Progress Bar --}}
                 <div class="mt-8 px-4 sm:px-0">
                     {{-- Kode Booking --}}
                     <div class="p-4 sm:p-8 md:p-12 max-w-5xl mx-auto text-sm sm:text-base md:text-lg">
@@ -162,7 +161,7 @@
                             class="bg-blue text-light-gray text-xl md:text-2xl px-4 md:px-6 py-2 md:py-3 rounded-2xl w-full md:w-auto transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg hover:bg-light-gray hover:text-blue">
                             Pasien Lama
                         </button>
-                        <button @click="showFormPasienBaru = true"
+                        <button @click="showFormPasienBaru = true" id="btn-baru"
                             class="bg-green text-light-gray text-xl md:text-2xl px-4 md:px-6 py-2 md:py-3 rounded-2xl w-full md:w-auto transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg hover:bg-light-gray hover:text-green">
                             Pasien Baru
                         </button>
@@ -181,7 +180,7 @@
                             <label for="nomor_rm" class="text-base sm:text-lg mb-2 text-left w-full">
                                 Nomor Rekam Medis<span class="text-red-500 ml-1">*</span>
                             </label>
-                            <input type="number" id="nomor_rm" name="nomor_rm"
+                            <input type="number" id="nomor_rm" name="nomor_rm" maxlength="6"
                                 class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-4"
                                 required>
 
@@ -192,57 +191,6 @@
                                 class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6"
                                 required>
 
-                            <div id="patientData" class="hidden w-full">
-                                <label for="nama_pasien" class="text-base sm:text-lg mb-2 text-left w-full">
-                                    Nama Lengkap
-                                </label>
-                                <input type="text" id="nama_pasien" name="nama_pasien"
-                                    class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-4"
-                                    readonly>
-
-                                <label for="tempat_lahir" class="text-base sm:text-lg mb-2 text-left w-full">
-                                    Tempat Lahir
-                                </label>
-                                <input type="text" id="tempat_lahir" name="tempat_lahir"
-                                    class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-4"
-                                    readonly>
-
-                                <label for="jenis_kelamin" class="text-base sm:text-lg mb-2 text-left w-full">
-                                    Jenis Kelamin
-                                </label>
-                                <input type="text" id="jenis_kelamin" name="jenis_kelamin"
-                                    class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-4"
-                                    readonly>
-
-                                <label for="alamat" class="text-base sm:text-lg mb-2 text-left w-full">
-                                    Alamat
-                                </label>
-                                <input type="text" id="alamat" name="alamat"
-                                    class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-4"
-                                    readonly>
-
-                                <label for="nomor_telepon" class="text-base sm:text-lg mb-2 text-left w-full">
-                                    Nomor Telepon
-                                </label>
-                                <input type="text" id="nomor_telepon" name="nomor_telepon"
-                                    class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-4"
-                                    readonly>
-
-                                <label for="email" class="text-base sm:text-lg mb-2 text-left w-full">
-                                    Email
-                                </label>
-                                <input type="email" id="email" name="email"
-                                    class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-4"
-                                    readonly>
-
-                                <label for="nomor_kartu" class="text-base sm:text-lg mb-2 text-left w-full">
-                                    Nomor Kartu
-                                </label>
-                                <input type="text" id="nomor_kartu" name="nomor_kartu"
-                                    class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-4"
-                                    readonly>
-                            </div>
-
                             <div class="w-full sm:w-5/6 flex justify-center space-x-4 mt-4">
                                 <button @click="showFormPasienLama = false; showFormPasienBaru = false;" type="button"
                                     class="bg-light-gray text-dark-gray px-4 py-2 rounded-xl border-2 border-blue hover:bg-light-gray/30 hover:text-dark-gray/30 hover:border-blue/30 transition duration-200">
@@ -250,6 +198,11 @@
                                 </button>
                                 <button @click="showFormPasienBaru = true; showFormPasienLama = false;" type="button"
                                     id="berikutnya"
+                                    class="bg-blue text-white px-4 py-2 rounded-xl hover:bg-blue/50 hover:text-white transition duration-200 hidden">
+                                    Berikutnya
+                                </button>
+                                <button @click="alert('Data Pasien Tidak Ditemukan');" type="button"
+                                    id="berikutnyaFalse"
                                     class="bg-blue text-white px-4 py-2 rounded-xl hover:bg-blue/50 hover:text-white transition duration-200">
                                     Berikutnya
                                 </button>
@@ -367,13 +320,13 @@
                                 <option value="" disabled selected>Pilih Dokter</option>
                                 @foreach ($jadwal as $dokter)
                                     <option value="{{ $dokter->dokter->id_dokter }}"
-                                        data-poliklinik="{{ $dokter->dokter->id_poliklinik }}" 
-                                        data-tanggal="{{$dokter->tanggal}}"
-                                        data-kuota="{{$dokter->kuota}}">
+                                        data-poliklinik="{{ $dokter->dokter->id_poliklinik }}"
+                                        data-tanggal="{{ $dokter->tanggal }}"
+                                        data-kuota="{{ $dokter->kuota }}">
                                         {{ $dokter->dokter->nama_dokter }} |
                                         {{ date('H:i', strtotime($dokter->jam_mulai)) }} -
                                         {{ date('H:i', strtotime($dokter->jam_selesai)) }}
-                                        (Kuota: {{$dokter->kuota}})
+                                        (Kuota: {{ $dokter->kuota }})
                                     </option>
                                 @endforeach
                             </select>
@@ -394,4 +347,127 @@
 
         </div>
     </div>
+@endsection
+
+@section('javascript')
+<script type="text/javascript">
+document.addEventListener('alpine:init', () => {
+    document.addEventListener('DOMContentLoaded', function() {
+        const nomor_rm = document.getElementById('nomor_rm');
+        const tanggal_lahir = document.getElementById('tanggal_lahir');
+        const patientData = document.getElementById('patientData');
+
+        function limitInputLength(event) {
+            if (event.target.value.length > 6) {
+                event.target.value = event.target.value.slice(0, 6);
+            }
+        }
+        nomor_rm.addEventListener('input', limitInputLength);
+
+        function checkPatient() {
+            if (nomor_rm.value && tanggal_lahir.value) {
+                fetch(
+                        `/check-patient?nomor_rm=${nomor_rm.value}&tanggal_lahir=${tanggal_lahir.value}`
+                    )
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.exists) {
+                            document.getElementById('id_pasien').value = data.id_pasien;
+                            document.getElementById('nama_pasien_baru').value = data
+                                .nama_pasien;
+                            document.getElementById('tempat_lahir_baru').value = data
+                                .tempat_lahir;
+                            document.getElementById('tanggal_lahir_baru').value = data
+                                .tanggal_lahir;
+                            if (data.jenis_kelamin == "Perempuan") {
+                                document.querySelector(
+                                        'input[name="jenis_kelamin"][value="Perempuan"]')
+                                    .checked = true;
+                                document.querySelector(
+                                        'input[name="jenis_kelamin"][value="Laki-laki"]')
+                                    .disabled = true;
+                            } else {
+                                document.querySelector(
+                                        'input[name="jenis_kelamin"][value="Laki-laki"]')
+                                    .checked = true;
+                                document.querySelector(
+                                        'input[name="jenis_kelamin"][value="Perempuan"]')
+                                    .disabled = true;
+
+                            }
+                            document.getElementById('alamat_baru').value = data.alamat;
+                            document.getElementById('nomor_telepon_baru').value = data
+                                .nomor_telepon;
+                            document.getElementById('email_baru').value = data.email;
+                            document.getElementById('nomor_kartu_baru').value = data
+                                .nomor_kartu;
+                            document.getElementById('berikutnya').classList.remove('hidden');
+                            document.getElementById('berikutnyaFalse').classList.add('hidden');
+
+                            document.getElementById('nama_pasien_baru').setAttribute('readonly',
+                                true);
+                            document.getElementById('tempat_lahir_baru').setAttribute(
+                                'readonly', true);
+                            document.getElementById('tanggal_lahir_baru').setAttribute(
+                                'readonly', true);
+                            document.getElementById('alamat_baru').setAttribute('readonly',
+                                true);
+                            document.getElementById('nomor_telepon_baru').setAttribute(
+                                'readonly', true);
+                            document.getElementById('email_baru').setAttribute('readonly',
+                                true);
+                            document.getElementById('nomor_kartu_baru').setAttribute('readonly',
+                                true);
+                        } else {
+                            // patientData.classList.add('hidden');
+                            document.getElementById('berikutnya').classList.add('hidden');
+                            document.getElementById('berikutnyaFalse').classList.remove(
+                                'hidden');
+                        }
+                    });
+            }
+        }
+
+        function openAll() {
+            document.getElementById('nama_pasien_baru').removeAttribute('readonly');
+            document.getElementById('tempat_lahir_baru').removeAttribute('readonly');
+            document.getElementById('tanggal_lahir_baru').removeAttribute('readonly');
+            document.getElementById('alamat_baru').removeAttribute('readonly');
+            document.getElementById('nomor_telepon_baru').removeAttribute('readonly');
+            document.getElementById('email_baru').removeAttribute('readonly');
+            document.getElementById('nomor_kartu_baru').removeAttribute('readonly');
+
+            document.querySelector(
+                    'input[name="jenis_kelamin"][value="Perempuan"]')
+                .checked = false;
+            document.querySelector(
+                    'input[name="jenis_kelamin"][value="Laki-laki"]')
+                .disabled = false;
+            document.querySelector(
+                    'input[name="jenis_kelamin"][value="Laki-laki"]')
+                .checked = false;
+            document.querySelector(
+                    'input[name="jenis_kelamin"][value="Perempuan"]')
+                .disabled = false;
+
+            document.getElementById('id_pasien').value = null;
+            document.getElementById('nama_pasien_baru').value = null;
+            document.getElementById('tempat_lahir_baru').value = null;
+            document.getElementById('tanggal_lahir_baru').value = null;
+
+            document.getElementById('alamat_baru').value = null;
+            document.getElementById('nomor_telepon_baru').value = null;
+            document.getElementById('email_baru').value = null;
+            document.getElementById('nomor_kartu_baru').value = null;
+
+            document.getElementById('berikutnya').classList.add('hidden');
+            document.getElementById('berikutnyaFalse').classList.remove(
+                'hidden');
+        }
+        nomor_rm.addEventListener('blur', checkPatient);
+        tanggal_lahir.addEventListener('change', checkPatient);
+        document.getElementById('btn-baru').addEventListener('click', openAll);
+    });
+})
+</script>
 @endsection

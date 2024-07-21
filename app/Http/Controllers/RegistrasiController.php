@@ -134,19 +134,22 @@ class RegistrasiController extends Controller
         $jadwal->kuota = $jadwal->kuota - 1;
         $jadwal->save();
 
-        $besok = Carbon::tomorrow()->toDateString();
+        $besok = Carbon::tomorrow()->format('d-m-Y');
         return view('regis.index', compact('kode', 'besok'));
     }
 
     public function jadwal($tgl)
     {
-        $jadwal = JadwalDokter::with(['poliklinik', 'dokter'])->where('tanggal', $tgl)->get();
-
+        $jadwal = JadwalDokter::with(['poliklinik', 'dokter'])
+            ->where('tanggal', $tgl)
+            ->where('kuota', '>', 0)
+            ->get();
+    
         foreach ($jadwal as $value) {
             $value->jam_mulai = date('H:i', strtotime($value->jam_mulai));
             $value->jam_selesai = date('H:i', strtotime($value->jam_selesai));
         }
-
+    
         return response()->json(['jadwal' => $jadwal]);
     }
 
