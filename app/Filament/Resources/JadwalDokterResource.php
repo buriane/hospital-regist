@@ -40,7 +40,12 @@ class JadwalDokterResource extends Resource
     private static function determineShift($jamMulai)
     {
         $hour = Carbon::parse($jamMulai)->hour;
-        return $hour < 12 ? 'Pagi' : 'Sore';
+        
+        if ($hour >= 14 && $hour < 21) {
+            return 'Sore';
+        } else {
+            return 'Pagi';
+        }
     }
 
     public static function form(Form $form): Form
