@@ -153,6 +153,20 @@ class RegistrasiController extends Controller
         return response()->json(['jadwal' => $jadwal]);
     }
 
+    function download_pdf($kode, $tanggal)
+    {
+        $mpdf = new \Mpdf\Mpdf();
+        $html = "
+        <h1 style='text-align: center;'>Bukti Pendaftaran RSU St. Elisabeth Purwokerto</h1>
+        <p><strong>Kode Booking:</strong> {$kode}</p>
+        <p><strong>Tanggal Kunjungan:</strong> {$tanggal}</p>
+        ";
+        
+        $mpdf->WriteHTML($html);
+        
+        return $mpdf->Output('bukti-pendaftaran-rsu-elisabeth-purwokerto.pdf', 'D');
+    }
+
     /**
      * Display the specified resource.
      */
