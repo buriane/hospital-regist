@@ -248,7 +248,7 @@ class RegistrasiResource extends Resource
                         ->deselectRecordsAfterCompletion(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

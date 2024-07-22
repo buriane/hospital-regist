@@ -103,21 +103,26 @@ class JadwalDokterResource extends Resource
                         ->searchable()
                         ->preload()
                         ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->nama_dokter}"),
+                    DatePicker::make('tanggal_mulai')
+                        ->label('Tanggal Mulai')
+                        ->required(),
+                    DatePicker::make('tanggal_akhir')
+                        ->label('Tanggal Akhir')
+                        ->required(),
                     Repeater::make('jadwal')
                         ->schema([
-                            DatePicker::make('tanggal')
-                                ->required()
-                                ->reactive()
-                                ->afterStateUpdated(function ($state, callable $set) {
-                                    if ($state) {
-                                        $dayName = Carbon::parse($state)->locale('id')->dayName;
-                                        $set('hari', ucfirst($dayName));
-                                    }
-                                }),
-                            TextInput::make('hari')
+                            Select::make('hari')
                                 ->label('Hari')
-                                ->disabled()
-                                ->dehydrated(true),
+                                ->options([
+                                    'Senin' => 'Senin',
+                                    'Selasa' => 'Selasa',
+                                    'Rabu' => 'Rabu',
+                                    'Kamis' => 'Kamis',
+                                    'Jumat' => 'Jumat',
+                                    'Sabtu' => 'Sabtu',
+                                    'Minggu' => 'Minggu',
+                                ])
+                                ->required(),
                             Grid::make(2)
                                 ->schema([
                                     TimePicker::make('jam_mulai')
@@ -130,9 +135,9 @@ class JadwalDokterResource extends Resource
                             TextInput::make('kuota')
                                 ->numeric()
                                 ->required()
-                                ->rules(['min:1'])
+                                ->rules(['min:1']),
                         ])
-                        ->columns(2)
+                        ->columns(3)
                         ->defaultItems(1)
                         ->createItemButtonLabel('Tambah Jadwal')
                 ])->columns(1),
@@ -223,7 +228,7 @@ class JadwalDokterResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

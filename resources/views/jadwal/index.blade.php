@@ -31,9 +31,12 @@
                                 <td class="border border-gray-300 p-2 sm:p-3 text-center whitespace-nowrap">
                                     @php
                                         $jadwal = $dokter->jadwalDokters->where('hari', $hari);
+                                        $uniqueJadwal = $jadwal->unique(function ($item) {
+                                            return $item->jam_mulai . $item->jam_selesai;
+                                        });
                                     @endphp
-                                    @if($jadwal->isNotEmpty())
-                                        @foreach($jadwal as $item)
+                                    @if($uniqueJadwal->isNotEmpty())
+                                        @foreach($uniqueJadwal as $item)
                                             {{ date('H:i', strtotime($item->jam_mulai)) }} - {{ date('H:i', strtotime($item->jam_selesai)) }}<br>
                                         @endforeach
                                     @else

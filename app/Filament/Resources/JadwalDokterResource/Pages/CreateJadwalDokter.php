@@ -7,6 +7,7 @@ use Filament\Resources\Pages\CreateRecord;
 use App\Models\JadwalDokter;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Form;
+use Carbon\Carbon;
 
 class CreateJadwalDokter extends CreateRecord
 {
@@ -22,36 +23,35 @@ class CreateJadwalDokter extends CreateRecord
         return $form->schema(JadwalDokterResource::getCreateFormSchema());
     }
 
-    protected function handleRecordCreation(array $data): Model
+    protected function handleRecordCreation(array $data): JadwalDokter
     {
-        $model = $this->getModel();
-        return new $model();
-    }
-
-    protected function afterCreate(): void
-    {
-        $data = $this->form->getState();
-        $dokter_id = $data['id_dokter'];
-        
-        if (isset($data['jadwal']) && is_array($data['jadwal'])) {
-            foreach ($data['jadwal'] as $jadwal) {
-                if (
-                    isset($jadwal['tanggal']) &&
-                    isset($jadwal['hari']) &&
-                    isset($jadwal['jam_mulai']) &&
-                    isset($jadwal['jam_selesai']) &&
-                    isset($jadwal['kuota'])
-                ) {
-                    JadwalDokter::create([
-                        'id_dokter' => $dokter_id,
-                        'tanggal' => $jadwal['tanggal'],
-                        'hari' => $jadwal['hari'],
-                        'jam_mulai' => $jadwal['jam_mulai'],
-                        'jam_selesai' => $jadwal['jam_selesai'],
-                        'kuota' => $jadwal['kuota'],
+        $startDate = Carbon::parse($data['tanggal_mulai']);
+        $endDate = Carbon::parse($data['tanggal_akhir']);
+        $createdJadwal = null;
+    
+        foreach ($data['jadwal'] as $jadwalItem) {
+            $dayOfWeek = array_search($jadwalItem['hari'], ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']);
+            $currentDate = $startDate->copy();
+    
+            while ($currentDate <= $endDate) {
+                if ($currentDate->dayOfWeek === $dayOfWeek) {
+                    $jadwal = JadwalDokter::create([
+                        'id_dokter' => $data['id_dokter'],
+                        'tanggal' => $currentDate->toDateString(),
+                        'hari' => $jadwalItem['hari'],
+                        'jam_mulai' => $jadwalItem['jam_mulai'],
+                        'jam_selesai' => $jadwalItem['jam_selesai'],
+                        'kuota' => $jadwalItem['kuota'],
                     ]);
+    
+                    if (!$createdJadwal) {
+                        $createdJadwal = $jadwal;
+                    }
                 }
+                $currentDate->addDay();
             }
         }
+    
+        return $createdJadwal;
     }
 }
