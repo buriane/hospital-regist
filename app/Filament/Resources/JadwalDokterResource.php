@@ -77,9 +77,11 @@ class JadwalDokterResource extends Resource
                         Grid::make(2)
                             ->schema([
                                 TimePicker::make('jam_mulai')
-                                    ->required(),
+                                    ->required()
+                                    ->withoutSeconds(),
                                 TimePicker::make('jam_selesai')
-                                    ->required(),
+                                    ->required()
+                                    ->withoutSeconds(),
                             ]),
                         TextInput::make('kuota')
                             ->numeric()
@@ -119,9 +121,11 @@ class JadwalDokterResource extends Resource
                             Grid::make(2)
                                 ->schema([
                                     TimePicker::make('jam_mulai')
-                                        ->required(),
+                                        ->required()
+                                        ->withoutSeconds(),
                                     TimePicker::make('jam_selesai')
-                                        ->required(),
+                                        ->required()
+                                        ->withoutSeconds(),
                                 ]),
                             TextInput::make('kuota')
                                 ->numeric()

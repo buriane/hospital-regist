@@ -155,11 +155,85 @@ class RegistrasiController extends Controller
 
     function download_pdf($kode, $tanggal)
     {
-        $mpdf = new \Mpdf\Mpdf();
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+        ]);
+        
+        $logoPath = public_path('logo.png');
+        
         $html = "
-        <h1 style='text-align: center;'>Bukti Pendaftaran RSU St. Elisabeth Purwokerto</h1>
-        <p><strong>Kode Booking:</strong> {$kode}</p>
-        <p><strong>Tanggal Kunjungan:</strong> {$tanggal}</p>
+        <html>
+        <head>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                }
+                .container {
+                    width: 100%;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    box-sizing: border-box;
+                    border: 2px solid #007bff;
+                    border-radius: 10px;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                .header h1 {
+                    color: #007bff;
+                    margin: 0;
+                    font-size: 24px;
+                    line-height: 1.2;
+                }
+                .logo {
+                    width: 100px;
+                    height: auto;
+                    margin: 20px 0;
+                }
+                .info {
+                    background-color: #f8f9fa;
+                    padding: 15px;
+                    border-radius: 5px;
+                    margin-bottom: 20px;
+                }
+                .info p {
+                    margin: 10px 0;
+                    text-align: center;
+                }
+                .footer {
+                    text-align: center;
+                    font-style: italic;
+                    color: #6c757d;
+                }
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h1>Bukti Pendaftaran</h1>
+                    <h1>RSU St. Elisabeth Purwokerto</h1>
+                </div>
+                <div style='text-align: center;'>
+                    <img src='{$logoPath}' class='logo' alt='Logo RSU St. Elisabeth'>
+                </div>
+                <div class='info'>
+                    <p><strong>Kode Booking:</strong> {$kode}</p>
+                    <p><strong>Tanggal Kunjungan:</strong> {$tanggal}</p>
+                    <p><strong>Waktu Kedatangan:</strong> 30 menit sebelum jadwal praktik</p>
+                </div>
+                <div class='footer'>
+                    <p>Silakan tunjukkan bukti pendaftaran ini di loket pendaftaran.</p>
+                </div>
+            </div>
+        </body>
+        </html>
         ";
         
         $mpdf->WriteHTML($html);

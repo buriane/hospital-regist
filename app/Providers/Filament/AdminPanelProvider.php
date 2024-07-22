@@ -28,7 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandLogo(asset('favicon.ico'))
+            ->brandLogo(asset('logo.png'))
             ->brandLogoHeight('3rem') 
             ->colors([
                 'primary' => Color::Blue,
@@ -41,6 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
+                \App\Filament\Widgets\WeeklyRegistrationChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,

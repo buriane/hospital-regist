@@ -30,6 +30,7 @@ use App\Models\JadwalDokter;
 use Carbon\Carbon;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Filters\Filter;
 
 class RegistrasiResource extends Resource
 {
@@ -183,6 +184,23 @@ class RegistrasiResource extends Resource
                     ->searchable(),
             ])
             ->filters([
+                Filter::make('tanggal_kunjungan')
+                    ->form([
+                        DatePicker::make('tanggal_kunjungan')
+                            ->label('Filter Tanggal Kunjungan'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['tanggal_kunjungan'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('tanggal_kunjungan', $date),
+                        );
+                    })
+                    ->indicateUsing(function (array $data): ?string {
+                        if ($data['tanggal_kunjungan'] ?? null) {
+                            return 'Tanggal Kunjungan: ' . Carbon::parse($data['tanggal_kunjungan'])->toFormattedDateString();
+                        }
+                        return null;
+                    }),
                 SelectFilter::make('poliklinik')
                     ->relationship('poliklinik', 'nama_poliklinik')
                     ->label('Filter Poliklinik')
