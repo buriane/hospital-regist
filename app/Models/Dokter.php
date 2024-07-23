@@ -41,6 +41,11 @@ class Dokter extends Model
         return $this->hasMany(CutiDokter::class, 'id_dokter');
     }
 
+    public function cutiDokters()
+    {
+        return $this->hasMany(CutiDokter::class, 'id_dokter');
+    }
+
     public function isCuti()
     {
         return $this->cutiDokter()

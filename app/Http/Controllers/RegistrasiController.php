@@ -19,7 +19,15 @@ class RegistrasiController extends Controller
     public function index()
     {
         $polikliniks = Poliklinik::all();
-        $jadwal = JadwalDokter::with(['poliklinik', 'dokter'])->get();
+        $today = Carbon::now()->toDateString();
+        $tomorrow = Carbon::tomorrow()->toDateString();
+        
+        $jadwal = JadwalDokter::with(['poliklinik', 'dokter'])
+            ->whereDoesntHave('dokter.cutiDokter', function ($query) use ($today, $tomorrow) {
+                $query->where('tanggal_mulai', '<=', $tomorrow)
+                        ->where('tanggal_selesai', '>=', $today);
+            })
+            ->get();
     
         return view('regis.index', compact('polikliniks', 'jadwal'));
     }
@@ -143,13 +151,17 @@ class RegistrasiController extends Controller
         $jadwal = JadwalDokter::with(['poliklinik', 'dokter'])
             ->where('tanggal', $tgl)
             ->where('kuota', '>', 0)
+            ->whereDoesntHave('dokter.cutiDokter', function ($query) use ($tgl) {
+                $query->where('tanggal_mulai', '<=', $tgl)
+                        ->where('tanggal_selesai', '>=', $tgl);
+            })
             ->get();
-    
+
         foreach ($jadwal as $value) {
             $value->jam_mulai = date('H:i', strtotime($value->jam_mulai));
             $value->jam_selesai = date('H:i', strtotime($value->jam_selesai));
         }
-    
+
         return response()->json(['jadwal' => $jadwal]);
     }
 

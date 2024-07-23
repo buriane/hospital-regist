@@ -42,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 \App\Filament\Widgets\WeeklyRegistrationChart::class,
+                \App\Filament\Widgets\LiveClockWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

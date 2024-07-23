@@ -20,7 +20,7 @@ class JadwalDokterController extends Controller
     {
         $polikliniks = Poliklinik::with(['dokter' => function($query) {
             $query->has('jadwalDokters');
-        }, 'dokter.jadwalDokters'])->get();
+        }, 'dokter.jadwalDokters', 'dokter.cutiDokters'])->get();
     
         return view('jadwal.index', compact('polikliniks'));
     }
@@ -28,16 +28,26 @@ class JadwalDokterController extends Controller
     public function indexinfo()
     {
         Carbon::setLocale('id');
+        $today = now();
         $tomorrow = now()->addDay();
         $dayName = $tomorrow->translatedFormat('l');
-
+    
         $polikliniks = Poliklinik::with(['dokter' => function($query) use ($tomorrow) {
             $query->whereHas('jadwalDokters', function($subQuery) use ($tomorrow) {
                 $subQuery->whereDate('tanggal', $tomorrow);
             });
         }, 'dokter.jadwalDokters' => function($query) use ($tomorrow) {
             $query->whereDate('tanggal', $tomorrow);
-        }])->get();
+        }, 'dokter.cutiDokters'])->get();
+    
+        $polikliniks->each(function ($poliklinik) use ($today, $tomorrow) {
+            $poliklinik->dokter = $poliklinik->dokter->filter(function ($dokter) use ($today, $tomorrow) {
+                $onLeave = $dokter->cutiDokters->where('tanggal_mulai', '<=', $tomorrow)
+                                                ->where('tanggal_selesai', '>=', $today)
+                                                ->isNotEmpty();
+                return !$onLeave;
+            });
+        });
     
         return view('info.index', compact('polikliniks', 'tomorrow', 'dayName'));
     }

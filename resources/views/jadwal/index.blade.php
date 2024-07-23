@@ -34,8 +34,14 @@
                                         $uniqueJadwal = $jadwal->unique(function ($item) {
                                             return $item->jam_mulai . $item->jam_selesai;
                                         });
+                                        $tanggalHariIni = \Carbon\Carbon::now()->startOfWeek()->addDays(['Senin' => 0, 'Selasa' => 1, 'Rabu' => 2, 'Kamis' => 3, 'Jumat' => 4, 'Sabtu' => 5, 'Minggu' => 6][$hari]);
+                                        $sedangCuti = $dokter->cutiDokters->contains(function ($cuti) use ($tanggalHariIni) {
+                                            return $tanggalHariIni->between($cuti->tanggal_mulai, $cuti->tanggal_selesai);
+                                        });
                                     @endphp
-                                    @if($uniqueJadwal->isNotEmpty())
+                                    @if($sedangCuti)
+                                        <span class="ml-2 px-2 py-1 text-sm font-semibold bg-red-500 text-white rounded-full animate-pulse tracking-wider">Cuti</span>
+                                    @elseif($uniqueJadwal->isNotEmpty())
                                         @foreach($uniqueJadwal as $item)
                                             {{ date('H:i', strtotime($item->jam_mulai)) }} - {{ date('H:i', strtotime($item->jam_selesai)) }}<br>
                                         @endforeach

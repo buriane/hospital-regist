@@ -34,4 +34,9 @@ class ManagePasiens extends ManageRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('nomor_rm')),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

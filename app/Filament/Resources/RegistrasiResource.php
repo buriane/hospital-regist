@@ -166,6 +166,20 @@ class RegistrasiResource extends Resource
                 TextColumn::make('dokter.nama_dokter')
                     ->label('Dokter')
                     ->searchable(),
+                TextColumn::make('dokter_schedule')
+                    ->label('Jam Praktik')
+                    ->searchable()
+                    ->getStateUsing(function (Registrasi $record): string {
+                        $jadwal = JadwalDokter::where('id_dokter', $record->id_dokter)
+                            ->whereDate('tanggal', $record->tanggal_kunjungan)
+                            ->first();
+                    
+                        if ($jadwal) {
+                            return "{$jadwal->jam_mulai} - {$jadwal->jam_selesai}";
+                        }
+                    
+                        return 'N/A';
+                    }),
                 TextColumn::make('kode_booking')
                     ->searchable(),
                 TextColumn::make('status')
@@ -246,7 +260,6 @@ class RegistrasiResource extends Resource
                             $records->each->update(['status' => 'Canceled']);
                         })
                         ->deselectRecordsAfterCompletion(),
-                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])->defaultSort('created_at', 'desc');
     }

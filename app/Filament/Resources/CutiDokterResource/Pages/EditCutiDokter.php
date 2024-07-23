@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\DokterResource\Pages;
+namespace App\Filament\Resources\CutiDokterResource\Pages;
 
-use App\Filament\Resources\DokterResource;
+use App\Filament\Resources\CutiDokterResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditDokter extends EditRecord
+class EditCutiDokter extends EditRecord
 {
-    protected static string $resource = DokterResource::class;
+    protected static string $resource = CutiDokterResource::class;
 
     protected function getHeaderActions(): array
     {

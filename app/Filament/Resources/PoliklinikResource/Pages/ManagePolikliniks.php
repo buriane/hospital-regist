@@ -21,4 +21,9 @@ class ManagePolikliniks extends ManageRecords
     {
         return 'Data Poliklinik';
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }
