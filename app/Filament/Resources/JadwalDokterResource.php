@@ -26,6 +26,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Forms\Components\Repeater;
+use Filament\Notifications\Notification;
 
 class JadwalDokterResource extends Resource
 {
@@ -78,10 +79,23 @@ class JadwalDokterResource extends Resource
                             ->schema([
                                 TimePicker::make('jam_mulai')
                                     ->required()
-                                    ->withoutSeconds(),
+                                    ->withoutSeconds()
+                                    ->reactive(),
                                 TimePicker::make('jam_selesai')
                                     ->required()
-                                    ->withoutSeconds(),
+                                    ->withoutSeconds()
+                                    ->reactive()
+                                    ->afterOrEqual('jam_mulai')
+                                    ->afterStateUpdated(function ($state, callable $set, $get) {
+                                        if ($state && $get('jam_mulai') && $state <= $get('jam_mulai')) {
+                                            Notification::make()
+                                                ->danger()
+                                                ->title('Gagal edit jadwal dokter')
+                                                ->body('Jam selesai harus lebih dari jam mulai.')
+                                                ->send();
+                                            $set('jam_selesai', null);
+                                        }
+                                    }),
                             ]),
                         TextInput::make('kuota')
                             ->numeric()
@@ -105,10 +119,23 @@ class JadwalDokterResource extends Resource
                         ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->nama_dokter}"),
                     DatePicker::make('tanggal_mulai')
                         ->label('Tanggal Mulai')
-                        ->required(),
+                        ->required()
+                        ->reactive(),
                     DatePicker::make('tanggal_akhir')
                         ->label('Tanggal Akhir')
-                        ->required(),
+                        ->required()
+                        ->reactive()
+                        ->afterOrEqual('tanggal_mulai')
+                        ->afterStateUpdated(function ($state, callable $set, $get) {
+                            if ($state && $get('tanggal_mulai') && $state < $get('tanggal_mulai')) {
+                                Notification::make()
+                                    ->danger()
+                                    ->title('Gagal membuat jadwal dokter')
+                                    ->body('Tanggal akhir tidak boleh lebih awal dari tanggal mulai.')
+                                    ->send();
+                                $set('tanggal_akhir', null);
+                            }
+                        }),
                     Repeater::make('jadwal')
                         ->schema([
                             Select::make('hari')
@@ -127,10 +154,23 @@ class JadwalDokterResource extends Resource
                                 ->schema([
                                     TimePicker::make('jam_mulai')
                                         ->required()
-                                        ->withoutSeconds(),
+                                        ->withoutSeconds()
+                                        ->reactive(),
                                     TimePicker::make('jam_selesai')
                                         ->required()
-                                        ->withoutSeconds(),
+                                        ->withoutSeconds()
+                                        ->reactive()
+                                        ->afterOrEqual('jam_mulai')
+                                        ->afterStateUpdated(function ($state, callable $set, $get) {
+                                            if ($state && $get('jam_mulai') && $state <= $get('jam_mulai')) {
+                                                Notification::make()
+                                                    ->danger()
+                                                    ->title('Gagal membuat jadwal dokter')
+                                                    ->body('Jam selesai harus lebih dari jam mulai.')
+                                                    ->send();
+                                                $set('jam_selesai', null);
+                                            }
+                                        }),
                                 ]),
                             TextInput::make('kuota')
                                 ->numeric()

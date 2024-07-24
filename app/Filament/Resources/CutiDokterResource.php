@@ -17,6 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Notifications\Notification;
 
 class CutiDokterResource extends Resource
 {
@@ -45,7 +46,23 @@ class CutiDokterResource extends Resource
                             ->required(),
                         DatePicker::make('tanggal_selesai')
                             ->label('Tanggal Selesai')
-                            ->required(),
+                            ->required()
+                            ->afterOrEqual('tanggal_mulai')
+                            ->validationMessages([
+                                'after_or_equal' => 'Tanggal selesai harus sama dengan atau setelah tanggal mulai.',
+                            ])
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set, $get) {
+                                if ($state && $get('tanggal_mulai') && $state < $get('tanggal_mulai')) {
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('Gagal membuat cuti dokter')
+                                        ->body('Tanggal mulai tidak boleh melebihi tanggal selesai.')
+                                        ->send();
+                                    
+                                    $set('tanggal_selesai', null);
+                                }
+                            }),
                     ]),
             ]);
     }

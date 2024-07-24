@@ -23,7 +23,7 @@ use Filament\Tables\Contracts\HasTable;
 use stdClass;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
-
+use Illuminate\Contracts\View\View;
 
 class PasienResource extends Resource
 {
@@ -112,6 +112,15 @@ class PasienResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('detail')
+                    ->label('Detail')
+                    ->icon('heroicon-s-eye')
+                    ->color('warning')
+                    ->modalHeading('Detail Pasien')
+                    ->modalContent(function (Pasien $record): View {
+                        return view('filament.pages.actions.pasien', ['record' => $record]);
+                    })
+                    ->modalSubmitAction(false),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

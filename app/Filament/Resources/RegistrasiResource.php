@@ -31,6 +31,7 @@ use Carbon\Carbon;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\Filter;
+use Illuminate\Contracts\View\View;
 
 class RegistrasiResource extends Resource
 {
@@ -231,6 +232,15 @@ class RegistrasiResource extends Resource
                     ->searchable(),
             ])
             ->actions([
+                Tables\Actions\Action::make('detail')
+                    ->label('Detail')
+                    ->icon('heroicon-s-eye')
+                    ->color('warning')
+                    ->modalHeading('Detail Registrasi')
+                    ->modalContent(function (Registrasi $record): View {
+                        return view('filament.pages.actions.registrasi', ['record' => $record]);
+                    })
+                    ->modalSubmitAction(false),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

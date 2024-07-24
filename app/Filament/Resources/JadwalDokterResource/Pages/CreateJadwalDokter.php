@@ -5,9 +5,9 @@ namespace App\Filament\Resources\JadwalDokterResource\Pages;
 use App\Filament\Resources\JadwalDokterResource;
 use Filament\Resources\Pages\CreateRecord;
 use App\Models\JadwalDokter;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Form;
 use Carbon\Carbon;
+use Filament\Notifications\Notification;
 
 class CreateJadwalDokter extends CreateRecord
 {
@@ -50,6 +50,16 @@ class CreateJadwalDokter extends CreateRecord
                 }
                 $currentDate->addDay();
             }
+        }
+    
+        if (!$createdJadwal) {
+            Notification::make()
+                ->danger()
+                ->title('Gagal membuat jadwal dokter')
+                ->body('Tidak ada jadwal yang dibuat. Pastikan hari yang dipilih berada dalam rentang tanggal yang ditentukan.')
+                ->send();
+
+            $this->halt();
         }
     
         return $createdJadwal;
