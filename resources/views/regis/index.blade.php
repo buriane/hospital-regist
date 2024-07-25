@@ -57,12 +57,21 @@
             <div class="mt-8 px-4 sm:px-0">
                 {{-- Kode Booking --}}
                 <div class="p-4 sm:p-8 md:p-12 max-w-5xl mx-auto text-sm sm:text-base md:text-lg">
-                    <p class="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 md:mb-12">Terima kasih telah menggunakan
+                    <p class="text-base sm:text-md md:text-lg mb-6 sm:mb-8 md:mb-12">Terima kasih telah menggunakan
                         layanan
                         kami.</p>
-                    <h1 class="text-green font-bold text-2xl sm:text-3xl mb-6 sm:mb-8 md:mb-12"><strong>Kode Booking :
-                            {{ $kode }}</strong></h1>
-                    <p class="text-base sm:text-lg md:text-xl">Silakan melakukan daftar ulang di loket pendaftaran,
+                    <h1 class="text-green font-bold text-2xl sm:text-3xl mb-2 sm:mb-4 md:mb-8">
+                        <strong>Kode Booking:</strong>
+                    </h1>
+
+                    {{-- QR Code --}}
+                    <div class="flex flex-col items-center mb-6 sm:mb-8 md:mb-12">
+                        {!! DNS2D::getBarcodeHTML("$kode", 'QRCODE', 5, 5) !!}
+                        <h1 class="text-green font-bold text-xl sm:text-2xl mt-4"><strong>{{ $kode }}</strong></h1>
+                    </div>
+                    {{-- End QR Code --}}
+
+                    <p class="text-base sm:text-md md:text-lg">Silakan download bukti pendaftaran dan melakukan daftar ulang di loket pendaftaran,
                         besok
                         tanggal <strong class="bg-yellow-200">{{ $besok }}</strong> dengan menunjukkan kode
                         booking, <strong class="bg-yellow-200">30 menit</strong> sebelum jadwal praktik</p>

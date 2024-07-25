@@ -88,3 +88,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
     input_id.dispatchEvent(new Event("onchange"));
 });
+
+// Loading Animation
+document.addEventListener("DOMContentLoaded", function() {
+    const loader = document.getElementById('loader');
+    const minLoadTime = 300;
+    let loadStartTime;
+
+    function showLoader() {
+        loadStartTime = Date.now();
+        loader.style.display = 'flex';
+    }
+
+    function hideLoader() {
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - loadStartTime;
+        const remainingTime = Math.max(0, minLoadTime - elapsedTime);
+
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, remainingTime);
+    }
+
+    showLoader(); 
+
+    window.addEventListener('load', function() {
+        hideLoader(); 
+    });
+
+    document.addEventListener('beforeunload', function() {
+        showLoader(); 
+    });
+});

@@ -27,6 +27,10 @@
                     {{ $record->status }}
                 </span>
             </p>
+            <div class="mt-4">
+                <p><strong>QR Code:</strong></p>
+                {!! DNS2D::getBarcodeHTML("$record->kode_booking", 'QRCODE', 4, 4) !!}
+            </div>
         </div>
     </div>
 

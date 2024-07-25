@@ -1,4 +1,12 @@
 <div class="space-y-4">
+    <div class="patient-status">
+        @if($record->nomor_rm)
+            <span class="text-lg font-medium rounded-full bg-primary-100 text-primary-800">Pasien Lama</span>
+        @else
+            <span class="text-lg font-medium rounded-full bg-success-100 text-success-800">Pasien Baru*</span>
+        @endif
+    </div>
+
     <div class="grid grid-cols-2 gap-4">
         <div>
             <h3 class="text-sm font-medium">Nomor RM</h3>

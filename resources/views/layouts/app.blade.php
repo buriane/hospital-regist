@@ -9,6 +9,9 @@
     @vite('resources/js/app.js')
 </head>
 <body class="antialiased font-sans bg-light-gray">
+    <div id="loader" class="loader-overlay">
+        <div class="loader"></div>
+    </div>
     @include('layouts.nav')
     <main>
         @yield('content')

@@ -10,6 +10,8 @@ use App\Models\Dokter;
 use App\Models\JadwalDokter;
 use App\Models\CutiDokter;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Milon\Barcode\DNS2D;
 
 class RegistrasiController extends Controller
 {
@@ -165,154 +167,32 @@ class RegistrasiController extends Controller
         return response()->json(['jadwal' => $jadwal]);
     }
 
-    function download_pdf($kode, $tanggal)
+    public function download_pdf($kode, $tanggal)
     {
         $registrasi = Registrasi::with(['pasien', 'poliklinik', 'dokter'])
             ->where('kode_booking', $kode)
             ->first();
-
+    
         if (!$registrasi) {
             abort(404, 'Registration not found');
         }
-
+    
         $jadwal = JadwalDokter::where('id_dokter', $registrasi->id_dokter)
             ->where('tanggal', $registrasi->tanggal_kunjungan)
             ->first();
-
-        $mpdf = new \Mpdf\Mpdf([
-            'margin_left' => 10,
-            'margin_right' => 10,
-            'margin_top' => 10,
-            'margin_bottom' => 10,
-        ]);
-        
+    
         $logoPath = public_path('logo.png');
-        
-        $html = "
-        <html>
-            <head>
-                <style>
-                    body {
-                        font-family: dejavusans, sans-serif;
-                        line-height: 1.6;
-                        color: #333;
-                    }
-                    .container {
-                        width: 100%;
-                        max-width: 600px;
-                        margin: 0 auto;
-                        padding: 20px;
-                        box-sizing: border-box;
-                        border: 2px solid #333;
-                        border-radius: 10px;
-                    }
-                    .header {
-                        text-align: center;
-                        margin-bottom: 20px;
-                    }
-                    .header h1 {
-                        color: #333;
-                        margin: 0;
-                        font-size: 18px;
-                        line-height: 1.2;
-                    }
-                    .logo {
-                        width: 80px;
-                        height: auto;
-                        margin: 10px auto;
-                        display: block;
-                    }
-                    .info {
-                        padding: 15px;
-                        border-radius: 5px;
-                    }
-                    .booking-code {
-                        text-align: center;
-                        font-size: 20px;
-                        margin-bottom: 15px;
-                    }
-                    .booking-code-number {
-                        display: block;
-                        font-size: 16px;
-                        margin-top: 10px;
-                        color: #333;
-                        padding-top: 10px;
-                    }
-                    .info-grid {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        gap: 15px;
-                    }
-                    .info-item {
-                        text-align: center;
-                        margin-bottom: 15px;
-                    }
-                    .info-label {
-                        font-weight: bold;
-                        margin-bottom: 5px;
-                    }
-                    .info-value {
-                        margin-top: 5px;
-                    }
-                    .footer {
-                        text-align: center;
-                        font-style: italic;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class='container'>
-                    <div style='text-align: center;'>
-                        <img src='{$logoPath}' class='logo' alt='Logo RSU St. Elisabeth'>
-                    </div>
-                    <div class='header'>
-                        Rumah Sakit Umum
-                        <h1>St. Elisabeth Purwokerto</h1>
-                    </div>
-                    <div class='info'>
-                        <div class='booking-code'>
-                            KODE BOOKING BUKTI PENDAFTARAN ANDA
-                            <div class='booking-code-number'>{$kode}</div>
-                        </div>
-                        <div class='info-grid'>
-                            <div class='info-item'>
-                                <div class='info-label'>Nama Pasien</div>
-                                <div class='info-value'>{$registrasi->pasien->nama_pasien}</div>
-                            </div>
-                            <div class='info-item'>
-                                <div class='info-label'>Tanggal Kunjungan</div>
-                                <div class='info-value'>{$tanggal}</div>
-                            </div>
-                            <div class='info-item'>
-                                <div class='info-label'>Poliklinik</div>
-                                <div class='info-value'>{$registrasi->poliklinik->nama_poliklinik}</div>
-                            </div>
-                            <div class='info-item'>
-                                <div class='info-label'>Dokter</div>
-                                <div class='info-value'>{$registrasi->dokter->nama_dokter}</div>
-                            </div>
-                            <div class='info-item'>
-                                <div class='info-label'>Jam Praktik</div>
-                                <div class='info-value'>" . date('H:i', strtotime($jadwal->jam_mulai)) . " - " . date('H:i', strtotime($jadwal->jam_selesai)) . "</div>
-                            </div>
-                            <div class='info-item'>
-                                <div class='info-label'>Waktu Kedatangan</div>
-                                <div class='info-value'>30 menit sebelum jadwal praktik</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class='footer'>
-                        <p>Silakan tunjukkan bukti pendaftaran ini di loket pendaftaran.</p>
-                    </div>
-                </div>
-            </body>
-        </html>
-        ";
-        
-        $mpdf->WriteHTML($html);
-        
-        return $mpdf->Output('bukti-pendaftaran-rsu-elisabeth-purwokerto.pdf', 'D');
+        $logoData = base64_encode(file_get_contents($logoPath));
+    
+        $dns2d = new DNS2D();
+        $qrcode = $dns2d->getBarcodePNG($kode, 'QRCODE', 5, 5);
+    
+        $html = view('pdf.bukti-pendaftaran', compact('registrasi', 'kode', 'tanggal', 'jadwal', 'logoData', 'qrcode'))->render();
+    
+        $pdf = PDF::loadHtml($html);
+        $pdf->setPaper('A4', 'portrait');
+    
+        return $pdf->download('bukti-pendaftaran-rsu-elisabeth-purwokerto.pdf');
     }
 
     /**
