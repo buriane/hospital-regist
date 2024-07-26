@@ -33,6 +33,8 @@ class PasienResource extends Resource
 
     protected static ?string $navigationLabel = 'Data Pasien';
 
+    protected static ?string $navigationGroup = 'Manajemen Pasien';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -124,6 +126,7 @@ class PasienResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
+            ->recordAction('detail')
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

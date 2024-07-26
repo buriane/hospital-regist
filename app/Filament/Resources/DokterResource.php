@@ -30,6 +30,7 @@ class DokterResource extends Resource
 
     protected static ?int $navigationSort = 0;
 
+    protected static ?string $navigationGroup = 'Manajemen Dokter';
 
     public static function form(Form $form): Form
     {

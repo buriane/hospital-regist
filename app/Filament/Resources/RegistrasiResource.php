@@ -32,6 +32,9 @@ use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Contracts\View\View;
+use Filament\Notifications\Notification;
+use Filament\Forms\Components\ViewField;
+use Filament\Forms\Set;
 
 class RegistrasiResource extends Resource
 {
@@ -42,6 +45,8 @@ class RegistrasiResource extends Resource
     protected static ?string $navigationLabel = 'Data Registrasi';
 
     protected static ?int $navigationSort = -2;
+
+    protected static ?string $navigationGroup = 'Manajemen Pasien';
 
     private static function generateUniqueBookingCode(): string
     {
@@ -71,6 +76,24 @@ class RegistrasiResource extends Resource
                         DatePicker::make('tanggal_kunjungan')
                             ->required()
                             ->live()
+                            ->format('Y-m-d')
+                            ->displayFormat('d/m/Y')
+                            ->afterStateUpdated(function ($state, callable $set, $livewire) {
+                                $tomorrow = Carbon::tomorrow()->startOfDay();
+                                $maxDate = Carbon::tomorrow()->addDays(6)->endOfDay();
+                                
+                                $selectedDate = $state ? Carbon::parse($state) : null;
+                                
+                                if ($selectedDate && ($selectedDate->lt($tomorrow) || $selectedDate->gt($maxDate))) {
+                                    $set('tanggal_kunjungan', $tomorrow->format('Y-m-d'));
+                                    
+                                    Notification::make()
+                                        ->title('Tanggal tidak valid')
+                                        ->body('Tanggal kunjungan harus antara ' . $tomorrow->format('d/m/Y') . ' dan ' . $maxDate->format('d/m/Y') . '.')
+                                        ->warning()
+                                        ->send();
+                                }
+                            })
                             ->disabled(fn ($livewire) => $livewire instanceof Pages\EditRegistrasi),
                         Select::make('id_poliklinik')
                             ->label('Poliklinik')
@@ -83,7 +106,7 @@ class RegistrasiResource extends Resource
                             ->disabled(fn ($livewire) => $livewire instanceof Pages\EditRegistrasi),
                         Select::make('id_dokter')
                             ->label('Dokter')
-                            ->options(function (Get $get): Collection {
+                            ->options(function (Get $get, $livewire): Collection {
                                 $tanggalKunjungan = $get('tanggal_kunjungan');
                                 $idPoliklinik = $get('id_poliklinik');
                                 
@@ -91,17 +114,26 @@ class RegistrasiResource extends Resource
                                     return Collection::make();
                                 }
                         
-                                $availableDoctors = JadwalDokter::query()
+                                $query = JadwalDokter::query()
                                     ->whereHas('dokter', function ($query) use ($idPoliklinik) {
                                         $query->where('id_poliklinik', $idPoliklinik);
                                     })
                                     ->whereDate('tanggal', $tanggalKunjungan)
-                                    ->where('kuota', '>', 0)
-                                    ->with('dokter')
-                                    ->get()
-                                    ->mapWithKeys(function ($jadwal) {
+                                    ->with('dokter');
+                        
+                                if (!$livewire instanceof Pages\EditRegistrasi) {
+                                    $query->where('kuota', '>', 0);
+                                }
+                        
+                                $availableDoctors = $query->get()
+                                    ->mapWithKeys(function ($jadwal) use ($livewire) {
                                         $dokter = $jadwal->dokter;
-                                        $label = "{$dokter->nama_dokter} - {$jadwal->jam_mulai} s/d {$jadwal->jam_selesai} (Kuota: {$jadwal->kuota})";
+                                        $label = "{$dokter->nama_dokter} - {$jadwal->jam_mulai} s/d {$jadwal->jam_selesai}";
+                                        
+                                        if (!$livewire instanceof Pages\EditRegistrasi) {
+                                            $label .= " (Kuota: {$jadwal->kuota})";
+                                        }
+                        
                                         return [$dokter->id_dokter => $label];
                                     });
                         
@@ -129,6 +161,16 @@ class RegistrasiResource extends Resource
                             ->disabled()
                             ->dehydrated()
                             ->required(),
+                        ViewField::make('qr_code')
+                            ->view('filament.components.qrcode')
+                            ->visible(fn (Get $get): bool => $get('kode_booking') !== null)
+                            ->afterStateHydrated(function (Get $get, Set $set) {
+                                $kodeBooking = $get('kode_booking');
+                                if ($kodeBooking) {
+                                    $set('qr_code', ['kodeBooking' => $kodeBooking]);
+                                }
+                            })
+                            ->label('QR Code'),
                         Select::make('status')
                             ->options([
                                 'Pending' => 'Pending',
@@ -232,7 +274,7 @@ class RegistrasiResource extends Resource
                     ->searchable(),
             ])
             ->actions([
-                Tables\Actions\Action::make('detail')
+                Tables\Actions\Action::make('view')
                     ->label('Detail')
                     ->icon('heroicon-s-eye')
                     ->color('warning')
@@ -271,7 +313,9 @@ class RegistrasiResource extends Resource
                         })
                         ->deselectRecordsAfterCompletion(),
                 ]),
-            ])->defaultSort('created_at', 'desc');
+            ])
+            ->defaultSort('created_at', 'desc')
+            ->recordUrl(false);
     }
 
     public static function getRelations(): array

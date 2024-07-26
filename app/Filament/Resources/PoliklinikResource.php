@@ -26,6 +26,8 @@ class PoliklinikResource extends Resource
 
     protected static ?string $navigationLabel = 'Data Poliklinik';
 
+    protected static ?string $navigationGroup = 'Unit Pelayanan';
+
     public static function form(Form $form): Form
     {
         return $form

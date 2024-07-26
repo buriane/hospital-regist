@@ -14,7 +14,11 @@
         </div>
         <div>
             <h3 class="text-lg font-medium">Informasi Registrasi</h3>
-            <p><strong>Kode Booking:</strong> {{ $record->kode_booking }}</p>
+            <p><strong>Status:</strong> 
+                <span class="inline-block px-2 py-1 text-sm font-semibold rounded bg-gray-100 text-gray-700">
+                    {{ $record->status }}
+                </span>
+            </p>
             <p><strong>Tanggal Kunjungan:</strong> 
                 @if($record->tanggal_kunjungan instanceof \Carbon\Carbon)
                     {{ $record->tanggal_kunjungan->format('d/m/Y') }}
@@ -22,14 +26,10 @@
                     {{ $record->tanggal_kunjungan }}
                 @endif
             </p>
-            <p><strong>Status:</strong> 
-                <span class="inline-block px-2 py-1 text-sm font-semibold rounded bg-gray-100 text-gray-700">
-                    {{ $record->status }}
-                </span>
-            </p>
-            <div class="mt-4">
-                <p><strong>QR Code:</strong></p>
+            <p><strong>Kode Booking:</strong></p>
+            <div class="mt-4 flex flex-col">
                 {!! DNS2D::getBarcodeHTML("$record->kode_booking", 'QRCODE', 4, 4) !!}
+                <span class="p-3">{{ $record->kode_booking }}</span>
             </div>
         </div>
     </div>

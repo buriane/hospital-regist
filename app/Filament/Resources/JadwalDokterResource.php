@@ -38,6 +38,8 @@ class JadwalDokterResource extends Resource
 
     protected static ?int $navigationSort = -1;
 
+    protected static ?string $navigationGroup = 'Manajemen Dokter';
+
     private static function determineShift($jamMulai)
     {
         $hour = Carbon::parse($jamMulai)->hour;
