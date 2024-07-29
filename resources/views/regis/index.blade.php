@@ -75,7 +75,7 @@
                         Silakan download bukti pendaftaran dan melakukan daftar ulang di loket pendaftaran,
                         besok tanggal <strong class="bg-yellow-200">{{ $besok }}</strong> dengan menunjukkan kode
                         booking, <strong class="bg-yellow-200">30 menit</strong> sebelum jadwal praktik.
-                        Tidak perlu mencetak/print bukti pendaftaran ini, cukup tunjukkan di layar perangkat Anda kepada petugas loket pendaftaran.
+                        Tidak perlu mencetak/print bukti pendaftaran ini, <strong class="bg-yellow-200">cukup tunjukkan</strong> di layar perangkat Anda kepada petugas loket pendaftaran.
                     </p>
 
                     <div class="mt-8 flex justify-center">

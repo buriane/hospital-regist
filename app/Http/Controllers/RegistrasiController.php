@@ -151,16 +151,27 @@ class RegistrasiController extends Controller
             $registrasi->save();
         }
 
-        $hariKunjungan = Carbon::parse($registrasi->tanggal_kunjungan)->locale('id')->dayName;
-        $jadwal = JadwalDokter::where("id_dokter", $registrasi->id_dokter)
-                                ->where("hari", $hariKunjungan)
-                                ->first();
+        $tanggalKunjungan = Carbon::parse($registrasi->tanggal_kunjungan);
+        $hariKunjungan = $tanggalKunjungan->locale('id')->dayName;
     
-        if ($jadwal) {
-            $jadwal->kuota = $jadwal->kuota - 1;
-            $jadwal->save();
+        $jadwalKhusus = JadwalKhususDokter::where('id_dokter', $registrasi->id_dokter)
+            ->whereDate('tanggal', $tanggalKunjungan)
+            ->first();
+    
+        if ($jadwalKhusus) {
+            $jadwalKhusus->kuota = $jadwalKhusus->kuota - 1;
+            $jadwalKhusus->save();
+        } else {
+            $jadwal = JadwalDokter::where('id_dokter', $registrasi->id_dokter)
+                ->where('hari', $hariKunjungan)
+                ->first();
+            
+            if ($jadwal) {
+                $jadwal->kuota = $jadwal->kuota - 1;
+                $jadwal->save();
+            }
         }
-
+    
         $besok = Carbon::parse($request->tanggal_kunjungan)->format('d-m-Y');
         return view('regis.index', compact('kode', 'besok'));
     }
