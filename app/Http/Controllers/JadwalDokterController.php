@@ -9,6 +9,7 @@ use App\Models\Poliklinik;
 use App\Models\Dokter;
 use App\Models\JadwalDokter;
 use App\Models\CutiDokter;
+use App\Models\JadwalKhususDokter;
 use Carbon\Carbon;
 
 class JadwalDokterController extends Controller
@@ -18,11 +19,16 @@ class JadwalDokterController extends Controller
      */
     public function index()
     {
+        $startOfWeek = now()->startOfWeek();
+        $endOfWeek = now()->endOfWeek();
+    
         $polikliniks = Poliklinik::with(['dokter' => function($query) {
             $query->has('jadwalDokters');
-        }, 'dokter.jadwalDokters', 'dokter.cutiDokters'])->get();
+        }, 'dokter.jadwalDokters', 'dokter.cutiDokters', 'dokter.jadwalKhususDokters' => function($query) use ($startOfWeek, $endOfWeek) {
+            $query->whereBetween('tanggal', [$startOfWeek, $endOfWeek]);
+        }])->get();
     
-        return view('jadwal.index', compact('polikliniks'));
+        return view('jadwal.index', compact('polikliniks', 'startOfWeek', 'endOfWeek'));
     }
 
     public function indexinfo()
@@ -31,15 +37,20 @@ class JadwalDokterController extends Controller
         $today = now();
         $tomorrow = now()->addDay();
         $dayName = $tomorrow->translatedFormat('l');
-    
-        $polikliniks = Poliklinik::with(['dokter' => function($query) use ($tomorrow) {
-            $query->whereHas('jadwalDokters', function($subQuery) use ($tomorrow) {
-                $subQuery->whereDate('tanggal', $tomorrow);
+        $dayOfWeek = $tomorrow->dayOfWeekIso;
+
+        $polikliniks = Poliklinik::with(['dokter' => function($query) use ($tomorrow, $dayOfWeek) {
+            $query->whereHas('jadwalKhususDokters', function($subQuery) use ($tomorrow) {
+                $subQuery->where('tanggal', $tomorrow->toDateString());
+            })->orWhereHas('jadwalDokters', function($subQuery) use ($dayOfWeek) {
+                $subQuery->where('hari', $dayOfWeek);
             });
-        }, 'dokter.jadwalDokters' => function($query) use ($tomorrow) {
-            $query->whereDate('tanggal', $tomorrow);
+        }, 'dokter.jadwalKhususDokters' => function($query) use ($tomorrow) {
+            $query->where('tanggal', $tomorrow->toDateString());
+        }, 'dokter.jadwalDokters' => function($query) use ($dayOfWeek) {
+            $query->where('hari', $dayOfWeek);
         }, 'dokter.cutiDokters'])->get();
-    
+
         $polikliniks->each(function ($poliklinik) use ($today, $tomorrow) {
             $poliklinik->dokter = $poliklinik->dokter->filter(function ($dokter) use ($today, $tomorrow) {
                 $onLeave = $dokter->cutiDokters->where('tanggal_mulai', '<=', $tomorrow)
@@ -47,8 +58,14 @@ class JadwalDokterController extends Controller
                                                 ->isNotEmpty();
                 return !$onLeave;
             });
+
+            $poliklinik->dokter->each(function ($dokter) use ($tomorrow) {
+                $dokter->effectiveSchedule = $dokter->jadwalKhususDokters->where('tanggal', $tomorrow->toDateString())->isNotEmpty()
+                    ? $dokter->jadwalKhususDokters->where('tanggal', $tomorrow->toDateString())
+                    : $dokter->jadwalDokters;
+            });
         });
-    
+
         return view('info.index', compact('polikliniks', 'tomorrow', 'dayName'));
     }
 

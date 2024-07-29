@@ -341,7 +341,7 @@
                             class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6"
                             required>
                             <option value="" disabled selected>Pilih Dokter</option>
-                            @foreach ($jadwal as $dokter)
+                            @foreach ($jadwalKhusus as $dokter)
                                 <option value="{{ $dokter->dokter->id_dokter }}"
                                     data-poliklinik="{{ $dokter->dokter->id_poliklinik }}"
                                     data-tanggal="{{ $dokter->tanggal }}"
@@ -352,6 +352,18 @@
                                     (Kuota: {{ $dokter->kuota }})
                                 </option>
                             @endforeach
+                            
+                            @foreach ($jadwal as $dokter)
+                                <option value="{{ $dokter->dokter->id_dokter }}"
+                                    data-poliklinik="{{ $dokter->dokter->id_poliklinik }}"
+                                    data-hari="{{ $dokter->hari }}"
+                                    data-kuota="{{ $dokter->kuota }}">
+                                    {{ $dokter->dokter->nama_dokter }} |
+                                    {{ date('H:i', strtotime($dokter->jam_mulai)) }} -
+                                    {{ date('H:i', strtotime($dokter->jam_selesai)) }}
+                                    (Kuota: {{ $dokter->kuota }})
+                                </option>
+                            @endforeach                        
                         </select>
 
                         <div class="w-full sm:w-5/6 flex justify-center space-x-4 mt-4">

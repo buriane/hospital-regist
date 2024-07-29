@@ -39,8 +39,9 @@
         <p><strong>Poliklinik:</strong> {{ $record->poliklinik->nama_poliklinik }}</p>
         <p><strong>Dokter:</strong> {{ $record->dokter->nama_dokter }}</p>
         @php
+            $hariKunjungan = \Carbon\Carbon::parse($record->tanggal_kunjungan)->locale('id')->dayName;
             $jadwal = App\Models\JadwalDokter::where('id_dokter', $record->id_dokter)
-                ->whereDate('tanggal', $record->tanggal_kunjungan)
+                ->where('hari', $hariKunjungan)
                 ->first();
         @endphp
         @if($jadwal)

@@ -9,6 +9,7 @@ use App\Models\Poliklinik;
 use App\Models\Dokter;
 use App\Models\JadwalDokter;
 use App\Models\CutiDokter;
+use App\Models\JadwalKhususDokter;
 
 class PasienController extends Controller
 {

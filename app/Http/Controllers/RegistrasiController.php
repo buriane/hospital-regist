@@ -9,6 +9,7 @@ use App\Models\Poliklinik;
 use App\Models\Dokter;
 use App\Models\JadwalDokter;
 use App\Models\CutiDokter;
+use App\Models\JadwalKhususDokter;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Milon\Barcode\DNS2D;
@@ -21,17 +22,27 @@ class RegistrasiController extends Controller
     public function index()
     {
         $polikliniks = Poliklinik::all();
-        $today = Carbon::now()->toDateString();
-        $tomorrow = Carbon::tomorrow()->toDateString();
+        $today = Carbon::now();
+        $tomorrow = Carbon::tomorrow();
         
+        // Fetch special schedules
+        $jadwalKhusus = JadwalKhususDokter::with(['dokter'])
+            ->whereDate('tanggal', '>=', $today)
+            ->get();
+    
+        // Get doctor IDs with special schedules
+        $specialDoctorIds = $jadwalKhusus->pluck('id_dokter')->toArray();
+        
+        // Fetch regular schedules excluding doctors with special schedules
         $jadwal = JadwalDokter::with(['poliklinik', 'dokter'])
             ->whereDoesntHave('dokter.cutiDokter', function ($query) use ($today, $tomorrow) {
                 $query->where('tanggal_mulai', '<=', $tomorrow)
                         ->where('tanggal_selesai', '>=', $today);
             })
+            ->whereNotIn('id_dokter', $specialDoctorIds)
             ->get();
-    
-        return view('regis.index', compact('polikliniks', 'jadwal'));
+            
+        return view('regis.index', compact('polikliniks', 'jadwal', 'jadwalKhusus'));
     }
 
     public function checkPatient(Request $request)
@@ -140,30 +151,47 @@ class RegistrasiController extends Controller
             $registrasi->save();
         }
 
-        $jadwal = JadwalDokter::where("id_dokter", $registrasi->id_dokter)->where("tanggal", $registrasi->tanggal_kunjungan)->first();
-        $jadwal->kuota = $jadwal->kuota - 1;
-        $jadwal->save();
+        $hariKunjungan = Carbon::parse($registrasi->tanggal_kunjungan)->locale('id')->dayName;
+        $jadwal = JadwalDokter::where("id_dokter", $registrasi->id_dokter)
+                                ->where("hari", $hariKunjungan)
+                                ->first();
+    
+        if ($jadwal) {
+            $jadwal->kuota = $jadwal->kuota - 1;
+            $jadwal->save();
+        }
 
-        $besok = Carbon::tomorrow()->format('d-m-Y');
+        $besok = Carbon::parse($request->tanggal_kunjungan)->format('d-m-Y');
         return view('regis.index', compact('kode', 'besok'));
     }
 
     public function jadwal($tgl)
     {
-        $jadwal = JadwalDokter::with(['poliklinik', 'dokter'])
-            ->where('tanggal', $tgl)
+        $hariKunjungan = Carbon::parse($tgl)->locale('id')->dayName;
+    
+        $jadwalKhusus = JadwalKhususDokter::with(['dokter'])
+            ->whereDate('tanggal', $tgl)
             ->where('kuota', '>', 0)
-            ->whereDoesntHave('dokter.cutiDokter', function ($query) use ($tgl) {
-                $query->where('tanggal_mulai', '<=', $tgl)
-                        ->where('tanggal_selesai', '>=', $tgl);
-            })
             ->get();
-
+    
+        if ($jadwalKhusus->isEmpty()) {
+            $jadwal = JadwalDokter::with(['poliklinik', 'dokter'])
+                ->where('hari', $hariKunjungan)
+                ->where('kuota', '>', 0)
+                ->whereDoesntHave('dokter.cutiDokter', function ($query) use ($tgl) {
+                    $query->where('tanggal_mulai', '<=', $tgl)
+                            ->where('tanggal_selesai', '>=', $tgl);
+                })
+                ->get();
+        } else {
+            $jadwal = $jadwalKhusus;
+        }
+    
         foreach ($jadwal as $value) {
             $value->jam_mulai = date('H:i', strtotime($value->jam_mulai));
             $value->jam_selesai = date('H:i', strtotime($value->jam_selesai));
         }
-
+    
         return response()->json(['jadwal' => $jadwal]);
     }
 
@@ -172,26 +200,38 @@ class RegistrasiController extends Controller
         $registrasi = Registrasi::with(['pasien', 'poliklinik', 'dokter'])
             ->where('kode_booking', $kode)
             ->first();
-    
+
         if (!$registrasi) {
             abort(404, 'Registration not found');
         }
-    
-        $jadwal = JadwalDokter::where('id_dokter', $registrasi->id_dokter)
-            ->where('tanggal', $registrasi->tanggal_kunjungan)
+
+        $tanggalKunjungan = Carbon::parse($registrasi->tanggal_kunjungan);
+        $hariKunjungan = $tanggalKunjungan->locale('id')->dayName;
+
+        // Cek apakah ada jadwal khusus
+        $jadwalKhusus = JadwalKhususDokter::where('id_dokter', $registrasi->id_dokter)
+            ->whereDate('tanggal', $tanggalKunjungan)
             ->first();
-    
+
+        if ($jadwalKhusus) {
+            $jadwal = $jadwalKhusus;
+        } else {
+            $jadwal = JadwalDokter::where('id_dokter', $registrasi->id_dokter)
+                ->where('hari', $hariKunjungan)
+                ->first();
+        }
+
         $logoPath = public_path('logo.png');
         $logoData = base64_encode(file_get_contents($logoPath));
-    
+
         $dns2d = new DNS2D();
         $qrcode = $dns2d->getBarcodePNG($kode, 'QRCODE', 5, 5);
-    
+
         $html = view('pdf.bukti-pendaftaran', compact('registrasi', 'kode', 'tanggal', 'jadwal', 'logoData', 'qrcode'))->render();
-    
+
         $pdf = PDF::loadHtml($html);
         $pdf->setPaper('A4', 'portrait');
-    
+
         return $pdf->download('bukti-pendaftaran-rsu-elisabeth-purwokerto.pdf');
     }
 

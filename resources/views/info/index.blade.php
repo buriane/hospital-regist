@@ -19,8 +19,8 @@
             <tbody>
                 @foreach($polikliniks as $poliklinik)
                     @php
-                        $hasDoctorSchedules = $poliklinik->dokter->flatMap->jadwalDokters->isNotEmpty();
-                        $hasAvailableQuota = $poliklinik->dokter->flatMap->jadwalDokters->where('kuota', '>', 0)->isNotEmpty();
+                        $hasDoctorSchedules = $poliklinik->dokter->flatMap->effectiveSchedule->isNotEmpty();
+                        $hasAvailableQuota = $poliklinik->dokter->flatMap->effectiveSchedule->where('kuota', '>', 0)->isNotEmpty();
                     @endphp
                     <tr>
                         <td colspan="3" class="p-2 sm:p-3 font-bold text-left text-light-gray whitespace-nowrap bg-blue border-b-2 border-light-blue">
@@ -38,7 +38,7 @@
                     </tr>
                     @if($hasDoctorSchedules)
                         @foreach($poliklinik->dokter as $dokter)
-                            @foreach($dokter->jadwalDokters as $jadwal)
+                            @foreach($dokter->effectiveSchedule as $jadwal)
                                 <tr>
                                     <td class="border border-gray-300 p-2 sm:p-3 pl-10 text-left whitespace-nowrap">{{ $dokter->nama_dokter }}</td>
                                     <td class="border border-gray-300 p-2 sm:p-3 text-center whitespace-nowrap">

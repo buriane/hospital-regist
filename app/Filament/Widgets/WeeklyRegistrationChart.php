@@ -28,7 +28,7 @@ class WeeklyRegistrationChart extends ChartWidget
 
         foreach ($period as $date) {
             $formattedDate = $date->format('Y-m-d');
-            $labels[] = $date->format('D'); // Short day name
+            $labels[] = $date->format('D');
             $data[] = $dailyCounts[$formattedDate] ?? 0;
         }
 

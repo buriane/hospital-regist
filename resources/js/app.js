@@ -35,17 +35,26 @@ document.addEventListener("DOMContentLoaded", function () {
 // Poli Dokter Filter
 document.addEventListener("DOMContentLoaded", function () {
     const poliklinikSelect = document.getElementById("poliklinik");
-    const tanggal = document.getElementById("tanggal_kunjungan_baru");
+    const tanggalInput = document.getElementById("tanggal_kunjungan_baru");
     const dokterSelect = document.getElementById("dokter");
     const dokterOptions = dokterSelect.querySelectorAll('option:not([value=""])');
-    var selectedPoliklinik = poliklinikSelect.value;
-    var selectedTanggal = tanggal.value;
+
+    function getDayName(date) {
+        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        return days[date.getDay()];
+    }
 
     function updateDokterOptions() {
+        const selectedPoliklinik = poliklinikSelect.value;
+        const selectedDate = new Date(tanggalInput.value);
+        const selectedDay = getDayName(selectedDate);
+
         dokterOptions.forEach((option) => {
+            const isSpecialSchedule = option.dataset.tanggal === tanggalInput.value;
+
             if (
                 option.dataset.poliklinik === selectedPoliklinik &&
-                option.dataset.tanggal === selectedTanggal &&
+                ((option.dataset.hari === selectedDay && !isSpecialSchedule) || isSpecialSchedule) &&
                 parseInt(option.dataset.kuota) > 0
             ) {
                 option.style.display = "";
@@ -53,22 +62,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 option.style.display = "none";
             }
         });
-
         dokterSelect.value = "";
     }
 
-    poliklinikSelect.addEventListener("change", function () {
-        selectedPoliklinik = this.value;
-        updateDokterOptions();
-    });
+    poliklinikSelect.addEventListener("change", updateDokterOptions);
+    tanggalInput.addEventListener("change", updateDokterOptions);
 
-    tanggal.addEventListener("change", function () {
-        selectedTanggal = this.value;
+    if (tanggalInput.value) {
         updateDokterOptions();
-    });
-
-    poliklinikSelect.dispatchEvent(new Event("change"));
-    tanggal.dispatchEvent(new Event("change"));
+    }
 });
 
 // Load Content

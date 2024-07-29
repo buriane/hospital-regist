@@ -13,12 +13,12 @@ class CutiDokterSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('cuti_dokters')->insert([
-            [
-                'id_dokter' => 1,
-                'tanggal_mulai' => '2024-07-22',
-                'tanggal_selesai' => '2024-07-23',
-            ],
-        ]);
+        // DB::table('cuti_dokters')->insert([
+        //     [
+        //         'id_dokter' => 1,
+        //         'tanggal_mulai' => '2024-07-22',
+        //         'tanggal_selesai' => '2024-07-23',
+        //     ],
+        // ]);
     }
 }

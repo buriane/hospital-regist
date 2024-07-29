@@ -11,16 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('jadwal_dokters', function (Blueprint $table) {
-            $table->id('id_jadwal_dokter');
+        Schema::create('jadwal_khusus_dokters', function (Blueprint $table) {
+            $table->id('id_jadwal_khusus_dokter');
             $table->unsignedBigInteger('id_dokter');
-            $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']);
             $table->date('tanggal');
             $table->time('jam_mulai');
             $table->time('jam_selesai');
             $table->integer('kuota');
             $table->timestamps();
-
+            
             $table->foreign('id_dokter')->references('id_dokter')->on('dokters')->onDelete('cascade');
         });
     }
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jadwal_dokters');
+        Schema::dropIfExists('jadwal_khusus_dokters');
     }
 };

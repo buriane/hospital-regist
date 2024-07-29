@@ -20,12 +20,13 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
         $this->call([
-            CutiDokterSeeder::class,
-            DokterSeeder::class,
-            JadwalDokterSeeder::class,
             PasienSeeder::class,
             PoliklinikSeeder::class,
+            DokterSeeder::class,
+            JadwalDokterSeeder::class,
+            CutiDokterSeeder::class,
             RegistrasiSeeder::class,
+            JadwalKhususDokterSeeder::class,
         ]);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\JadwalDokterResource\Pages;
-use App\Filament\Resources\JadwalDokterResource\RelationManagers;
-use App\Models\JadwalDokter;
+use App\Filament\Resources\JadwalKhususDokterResource\Pages;
+use App\Filament\Resources\JadwalKhususDokterResource\RelationManagers;
+use App\Models\JadwalKhususDokter;
 use App\Models\Dokter;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -13,29 +13,27 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TimePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Contracts\HasTable;
-use stdClass;
 use Carbon\Carbon;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
-use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Grid;
 use Filament\Notifications\Notification;
+use Filament\Forms\Components\Repeater;
+use Filament\Tables\Filters\Filter;
 
-class JadwalDokterResource extends Resource
+class JadwalKhususDokterResource extends Resource
 {
-    protected static ?string $model = JadwalDokter::class;
+    protected static ?string $model = JadwalKhususDokter::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-calendar';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
-    protected static ?string $navigationLabel = 'Data Jadwal Dokter';
+    protected static ?string $navigationLabel = 'Data Jadwal Khusus Dokter';
 
     protected static ?int $navigationSort = -1;
 
@@ -77,17 +75,8 @@ class JadwalDokterResource extends Resource
                                         'label' => "{$dokter->nama_dokter} - {$dokter->poliklinik->nama_poliklinik}"
                                     ])
                             ),
-                        Select::make('hari')
-                            ->label('Hari')
-                            ->options([
-                                'Senin' => 'Senin',
-                                'Selasa' => 'Selasa',
-                                'Rabu' => 'Rabu',
-                                'Kamis' => 'Kamis',
-                                'Jumat' => 'Jumat',
-                                'Sabtu' => 'Sabtu',
-                                'Minggu' => 'Minggu',
-                            ])
+                        DatePicker::make('tanggal')
+                            ->label('Tanggal')
                             ->required(),
                         Grid::make(2)
                             ->schema([
@@ -104,7 +93,7 @@ class JadwalDokterResource extends Resource
                                         if ($state && $get('jam_mulai') && $state <= $get('jam_mulai')) {
                                             Notification::make()
                                                 ->danger()
-                                                ->title('Gagal edit jadwal dokter')
+                                                ->title('Gagal edit jadwal khusus dokter')
                                                 ->body('Jam selesai harus lebih dari jam mulai.')
                                                 ->send();
                                             $set('jam_selesai', null);
@@ -143,19 +132,10 @@ class JadwalDokterResource extends Resource
                                     'label' => "{$dokter->nama_dokter} - {$dokter->poliklinik->nama_poliklinik}"
                                 ])
                         ),
-                    Repeater::make('jadwal')
+                    Repeater::make('jadwal_khusus')
                         ->schema([
-                            Select::make('hari')
-                                ->label('Hari')
-                                ->options([
-                                    'Senin' => 'Senin',
-                                    'Selasa' => 'Selasa',
-                                    'Rabu' => 'Rabu',
-                                    'Kamis' => 'Kamis',
-                                    'Jumat' => 'Jumat',
-                                    'Sabtu' => 'Sabtu',
-                                    'Minggu' => 'Minggu',
-                                ])
+                            DatePicker::make('tanggal')
+                                ->label('Tanggal')
                                 ->required(),
                             Grid::make(2)
                                 ->schema([
@@ -172,7 +152,7 @@ class JadwalDokterResource extends Resource
                                             if ($state && $get('jam_mulai') && $state <= $get('jam_mulai')) {
                                                 Notification::make()
                                                     ->danger()
-                                                    ->title('Gagal membuat jadwal dokter')
+                                                    ->title('Gagal membuat jadwal khusus dokter')
                                                     ->body('Jam selesai harus lebih dari jam mulai.')
                                                     ->send();
                                                 $set('jam_selesai', null);
@@ -186,7 +166,7 @@ class JadwalDokterResource extends Resource
                         ])
                         ->columns(3)
                         ->defaultItems(1)
-                        ->createItemButtonLabel('Tambah Jadwal')
+                        ->createItemButtonLabel('Tambah Jadwal Khusus')
                 ])->columns(1),
         ];
     }
@@ -201,9 +181,9 @@ class JadwalDokterResource extends Resource
                 TextColumn::make('dokter.poliklinik.nama_poliklinik')
                     ->label('Poliklinik')
                     ->searchable(),
-                TextColumn::make('hari')
-                    ->label('Hari')
-                    ->searchable()
+                TextColumn::make('tanggal')
+                    ->label('Tanggal')
+                    ->date()
                     ->sortable(),
                 BadgeColumn::make('shift')
                     ->label('Shift')
@@ -218,13 +198,13 @@ class JadwalDokterResource extends Resource
                     ]),
                 TextColumn::make('jam_mulai')
                     ->label('Jam Mulai')
+                    ->time()
                     ->sortable()
-                    ->searchable()
                     ->formatStateUsing(fn (string $state): string => Carbon::parse($state)->format('H:i')),
                 TextColumn::make('jam_selesai')
                     ->label('Jam Selesai')
+                    ->time()
                     ->sortable()
-                    ->searchable()
                     ->formatStateUsing(fn (string $state): string => Carbon::parse($state)->format('H:i')),
                 TextColumn::make('kuota')
                     ->label('Kuota')
@@ -232,6 +212,24 @@ class JadwalDokterResource extends Resource
                     ->searchable(),
             ])
             ->filters([
+                Filter::make('tanggal')
+                    ->form([
+                        DatePicker::make('tanggal')
+                            ->label('Tanggal')
+                            ->displayFormat('d/m/Y'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['tanggal'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('tanggal', $date),
+                        );
+                    })
+                    ->indicateUsing(function (array $data): ?string {
+                        if ($data['tanggal'] ?? null) {
+                            return 'Tanggal: ' . Carbon::parse($data['tanggal'])->format('d/m/Y');
+                        }
+                        return null;
+                    }),
                 SelectFilter::make('id_dokter')
                     ->label('Filter Dokter')
                     ->relationship('dokter', 'nama_dokter')
@@ -284,9 +282,9 @@ class JadwalDokterResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListJadwalDokters::route('/'),
-            'create' => Pages\CreateJadwalDokter::route('/create'),
-            'edit' => Pages\EditJadwalDokter::route('/{record}/edit'),
+            'index' => Pages\ListJadwalKhususDokters::route('/'),
+            'create' => Pages\CreateJadwalKhususDokter::route('/create'),
+            'edit' => Pages\EditJadwalKhususDokter::route('/{record}/edit'),
         ];
     }
 }

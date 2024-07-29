@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CutiDokterResource\Pages;
 use App\Filament\Resources\CutiDokterResource\RelationManagers;
 use App\Models\CutiDokter;
+use App\Models\Dokter;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -18,6 +19,8 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Notifications\Notification;
+use Filament\Tables\Filters\Filter;
+use Carbon\Carbon;
 
 class CutiDokterResource extends Resource
 {
@@ -42,7 +45,20 @@ class CutiDokterResource extends Resource
                             ->relationship('dokter', 'nama_dokter')
                             ->searchable()
                             ->preload()
-                            ->required(),
+                            ->required()
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->nama_dokter} - {$record->poliklinik->nama_poliklinik}")
+                            ->getSearchResultsUsing(fn (string $search) => 
+                                Dokter::where('nama_dokter', 'like', "%{$search}%")
+                                    ->orWhereHas('poliklinik', function ($query) use ($search) {
+                                        $query->where('nama_poliklinik', 'like', "%{$search}%");
+                                    })
+                                    ->limit(50)
+                                    ->get()
+                                    ->map(fn ($dokter) => [
+                                        'id' => $dokter->id,
+                                        'label' => "{$dokter->nama_dokter} - {$dokter->poliklinik->nama_poliklinik}"
+                                    ])
+                            ),
                         DatePicker::make('tanggal_mulai')
                             ->label('Tanggal Mulai')
                             ->required(),
@@ -74,7 +90,11 @@ class CutiDokterResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('dokter.nama_dokter')
-                    ->label('Nama Dokter'),
+                    ->label('Nama Dokter')
+                    ->searchable(),
+                TextColumn::make('dokter.poliklinik.nama_poliklinik')
+                    ->label('Poliklinik')
+                    ->searchable(),
                 TextColumn::make('tanggal_mulai')
                     ->label('Tanggal Mulai')
                     ->date()
@@ -87,9 +107,36 @@ class CutiDokterResource extends Resource
             ->filters([
                 SelectFilter::make('dokter')
                     ->relationship('dokter', 'nama_dokter')
-                    ->label('Cari Dokter')
+                    ->label('Filter Dokter')
+                    ->placeholder('Pilih Dokter')
                     ->searchable()
                     ->preload(),
+                SelectFilter::make('poliklinik')
+                    ->label('Filter Poliklinik')
+                    ->relationship('dokter.poliklinik', 'nama_poliklinik')
+                    ->multiple()
+                    ->preload()
+                    ->placeholder('Pilih Poliklinik')
+                    ->searchable(),
+                Filter::make('tanggal')
+                    ->form([
+                        Forms\Components\DatePicker::make('tanggal')
+                            ->label('Tanggal'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['tanggal'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('tanggal_mulai', '<=', $date)
+                                                                            ->whereDate('tanggal_selesai', '>=', $date)
+                            );
+                    })
+                    ->indicateUsing(function (array $data): ?string {
+                        if ($data['tanggal'] ?? null) {
+                            return 'Tanggal: ' . Carbon::parse($data['tanggal'])->format('d/m/Y');
+                        }
+                        return null;
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

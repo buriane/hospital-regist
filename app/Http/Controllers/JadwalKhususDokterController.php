@@ -9,9 +9,8 @@ use App\Models\Poliklinik;
 use App\Models\Dokter;
 use App\Models\JadwalDokter;
 use App\Models\CutiDokter;
-use App\Models\JadwalKhususDokter;
 
-class DokterController extends Controller
+class JadwalKhususDokterController extends Controller
 {
     /**
      * Display a listing of the resource.

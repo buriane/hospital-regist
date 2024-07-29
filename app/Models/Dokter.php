@@ -53,4 +53,9 @@ class Dokter extends Model
                     ->where('tanggal_selesai', '>=', now())
                     ->exists();
     }
+
+    public function jadwalKhususDokters()
+    {
+        return $this->hasMany(JadwalKhususDokter::class, 'id_dokter');
+    }
 }

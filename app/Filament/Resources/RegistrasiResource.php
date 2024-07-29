@@ -35,6 +35,8 @@ use Illuminate\Contracts\View\View;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\ViewField;
 use Filament\Forms\Set;
+use App\Models\CutiDokter;
+use App\Models\JadwalKhususDokter;
 
 class RegistrasiResource extends Resource
 {
@@ -114,19 +116,46 @@ class RegistrasiResource extends Resource
                                     return Collection::make();
                                 }
                         
+                                $hariKunjungan = Carbon::parse($tanggalKunjungan)->locale('id')->dayName;
+                        
+                                $specialSchedules = JadwalKhususDokter::where('tanggal', $tanggalKunjungan)
+                                    ->whereHas('dokter', function ($query) use ($idPoliklinik) {
+                                        $query->where('id_poliklinik', $idPoliklinik);
+                                    })
+                                    ->with('dokter')
+                                    ->get();
+        
+                                if ($specialSchedules->isNotEmpty()) {
+                                    return $specialSchedules->mapWithKeys(function ($jadwal) use ($livewire) {
+                                        $dokter = $jadwal->dokter;
+                                        $label = "{$dokter->nama_dokter} - {$jadwal->jam_mulai} s/d {$jadwal->jam_selesai}";
+                                        
+                                        if (!$livewire instanceof Pages\EditRegistrasi) {
+                                            $label .= " (Kuota: {$jadwal->kuota})";
+                                        }
+                        
+                                        return [$dokter->id_dokter => $label];
+                                    });
+                                }
+        
                                 $query = JadwalDokter::query()
                                     ->whereHas('dokter', function ($query) use ($idPoliklinik) {
                                         $query->where('id_poliklinik', $idPoliklinik);
                                     })
-                                    ->whereDate('tanggal', $tanggalKunjungan)
+                                    ->where('hari', $hariKunjungan)
                                     ->with('dokter');
                         
                                 if (!$livewire instanceof Pages\EditRegistrasi) {
                                     $query->where('kuota', '>', 0);
                                 }
                         
+                                $dokterCuti = CutiDokter::where('tanggal_mulai', '<=', $tanggalKunjungan)
+                                    ->where('tanggal_selesai', '>=', $tanggalKunjungan)
+                                    ->pluck('id_dokter')
+                                    ->toArray();
+                        
                                 $availableDoctors = $query->get()
-                                    ->mapWithKeys(function ($jadwal) use ($livewire) {
+                                    ->mapWithKeys(function ($jadwal) use ($livewire, $dokterCuti) {
                                         $dokter = $jadwal->dokter;
                                         $label = "{$dokter->nama_dokter} - {$jadwal->jam_mulai} s/d {$jadwal->jam_selesai}";
                                         
@@ -137,11 +166,19 @@ class RegistrasiResource extends Resource
                                         return [$dokter->id_dokter => $label];
                                     });
                         
-                                if ($availableDoctors->isEmpty()) {
-                                    return Collection::make(['0' => 'Tidak ada jadwal dokter yang tersedia']);
-                                }
+                                if ($livewire instanceof Pages\EditRegistrasi) {
+                                    return $availableDoctors->isEmpty() 
+                                        ? Collection::make(['0' => 'Tidak ada jadwal dokter yang tersedia'])
+                                        : $availableDoctors;
+                                } else {
+                                    $availableDoctors = $availableDoctors->reject(function ($label, $id) use ($dokterCuti) {
+                                        return in_array($id, $dokterCuti);
+                                    });
                         
-                                return $availableDoctors;
+                                    return $availableDoctors->isEmpty() 
+                                        ? Collection::make(['0' => 'Tidak ada jadwal dokter yang tersedia'])
+                                        : $availableDoctors;
+                                }
                             })
                             ->required()
                             ->disabled(fn ($livewire, Get $get): bool => 
@@ -153,6 +190,25 @@ class RegistrasiResource extends Resource
                             ->afterStateHydrated(function (Select $component, $state) {
                                 if ($state === '0') {
                                     $component->disabled();
+                                }
+                            })
+                            ->afterStateUpdated(function ($state, callable $set, Get $get) {
+                                if ($state) {
+                                    $tanggalKunjungan = $get('tanggal_kunjungan');
+                                    $hariKunjungan = Carbon::parse($tanggalKunjungan)->locale('id')->dayName;
+                                    $jadwalDokter = JadwalDokter::where('id_dokter', $state)
+                                        ->where('hari', $hariKunjungan)
+                                        ->first();
+                        
+                                    if ($jadwalDokter && $jadwalDokter->kuota <= 0) {
+                                        Notification::make()
+                                            ->title('Kuota Habis')
+                                            ->body('Maaf, kuota untuk dokter ini pada hari tersebut sudah habis.')
+                                            ->danger()
+                                            ->send();
+                        
+                                        $set('id_dokter', null);
+                                    }
                                 }
                             }),
                         TextInput::make('kode_booking')
@@ -193,9 +249,6 @@ class RegistrasiResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('pasien.nomor_rm')
-                    ->label('Nomor RM')
-                    ->searchable(),
                 TextColumn::make('pasien.nama_pasien')
                     ->label('Nama Pasien')
                     ->searchable(),
@@ -205,25 +258,33 @@ class RegistrasiResource extends Resource
                     ->searchable(),
                 TextColumn::make('poliklinik.nama_poliklinik')
                     ->label('Poliklinik')
-                    ->searchable(),
+                    ->searchable()
+                    ->wrap()
+                    ->extraAttributes(['style' => 'width: 200px;']),
                 TextColumn::make('dokter.nama_dokter')
                     ->label('Dokter')
-                    ->searchable(),
+                    ->searchable()
+                    ->wrap()
+                    ->extraAttributes(['style' => 'width: 200px;']),
                 TextColumn::make('dokter_schedule')
                     ->label('Jam Praktik')
                     ->searchable()
                     ->getStateUsing(function (Registrasi $record): string {
+                        $hariKunjungan = Carbon::parse($record->tanggal_kunjungan)->locale('id')->dayName;
                         $jadwal = JadwalDokter::where('id_dokter', $record->id_dokter)
-                            ->whereDate('tanggal', $record->tanggal_kunjungan)
+                            ->where('hari', $hariKunjungan)
                             ->first();
                     
                         if ($jadwal) {
-                            return "{$jadwal->jam_mulai} - {$jadwal->jam_selesai}";
+                            $jamMulai = Carbon::parse($jadwal->jam_mulai)->format('H:i');
+                            $jamSelesai = Carbon::parse($jadwal->jam_selesai)->format('H:i');
+                            return "{$jamMulai} - {$jamSelesai}";
                         }
                     
                         return 'N/A';
                     }),
                 TextColumn::make('kode_booking')
+                    ->label('Kode Booking')
                     ->searchable(),
                 TextColumn::make('status')
                     ->label('Status')

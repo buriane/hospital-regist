@@ -35,6 +35,11 @@ class Registrasi extends Model
         return $this->belongsTo(JadwalDokter::class, 'id_jadwal_dokter');
     }
 
+    public function jadwalKhususDokter()
+    {
+        return $this->belongsTo(JadwalKhususDokter::class, 'id_jadwal_khusus_dokter');
+    }
+
     public function poliklinik()
     {
         return $this->belongsTo(Poliklinik::class, 'id_poliklinik');

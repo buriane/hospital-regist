@@ -25,6 +25,11 @@ class Poliklinik extends Model
         return $this->hasManyThrough(JadwalDokter::class, Dokter::class, 'id_poliklinik', 'id_dokter', 'id_poliklinik', 'id_dokter');
     }
 
+    public function jadwalKhususDokter()
+    {
+        return $this->hasManyThrough(JadwalKhususDokter::class, Dokter::class, 'id_poliklinik', 'id_dokter', 'id_poliklinik', 'id_dokter');
+    }
+
     public function registrasi()
     {
         return $this->hasMany(Registrasi::class, 'id_poliklinik');
