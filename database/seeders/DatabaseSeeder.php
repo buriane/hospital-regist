@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             CutiDokterSeeder::class,
             RegistrasiSeeder::class,
             JadwalKhususDokterSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

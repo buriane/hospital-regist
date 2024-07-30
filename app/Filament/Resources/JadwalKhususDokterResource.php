@@ -75,11 +75,11 @@ class JadwalKhususDokterResource extends Resource
                                         'label' => "{$dokter->nama_dokter} - {$dokter->poliklinik->nama_poliklinik}"
                                     ])
                             ),
-                        DatePicker::make('tanggal')
-                            ->label('Tanggal')
-                            ->required(),
-                        Grid::make(2)
+                        Grid::make(4)
                             ->schema([
+                                DatePicker::make('tanggal')
+                                    ->label('Tanggal')
+                                    ->required(),
                                 TimePicker::make('jam_mulai')
                                     ->required()
                                     ->withoutSeconds()
@@ -99,12 +99,13 @@ class JadwalKhususDokterResource extends Resource
                                             $set('jam_selesai', null);
                                         }
                                     }),
-                            ]),
-                        TextInput::make('kuota')
-                            ->numeric()
-                            ->required()
-                            ->rules(['min:1'])
-                    ])->columns(1),
+                                TextInput::make('kuota')
+                                    ->numeric()
+                                    ->required()
+                                    ->rules(['min:1'])
+                            ])
+                    ])
+                    ->columns(1)
             ]);
     }
 
@@ -137,37 +138,34 @@ class JadwalKhususDokterResource extends Resource
                             DatePicker::make('tanggal')
                                 ->label('Tanggal')
                                 ->required(),
-                            Grid::make(2)
-                                ->schema([
-                                    TimePicker::make('jam_mulai')
-                                        ->required()
-                                        ->withoutSeconds()
-                                        ->reactive(),
-                                    TimePicker::make('jam_selesai')
-                                        ->required()
-                                        ->withoutSeconds()
-                                        ->reactive()
-                                        ->afterOrEqual('jam_mulai')
-                                        ->afterStateUpdated(function ($state, callable $set, $get) {
-                                            if ($state && $get('jam_mulai') && $state <= $get('jam_mulai')) {
-                                                Notification::make()
-                                                    ->danger()
-                                                    ->title('Gagal membuat jadwal khusus dokter')
-                                                    ->body('Jam selesai harus lebih dari jam mulai.')
-                                                    ->send();
-                                                $set('jam_selesai', null);
-                                            }
-                                        }),
-                                ]),
+                            TimePicker::make('jam_mulai')
+                                ->required()
+                                ->withoutSeconds()
+                                ->reactive(),
+                            TimePicker::make('jam_selesai')
+                                ->required()
+                                ->withoutSeconds()
+                                ->reactive()
+                                ->afterOrEqual('jam_mulai')
+                                ->afterStateUpdated(function ($state, callable $set, $get) {
+                                    if ($state && $get('jam_mulai') && $state <= $get('jam_mulai')) {
+                                        Notification::make()
+                                            ->danger()
+                                            ->title('Gagal membuat jadwal khusus dokter')
+                                            ->body('Jam selesai harus lebih dari jam mulai.')
+                                            ->send();
+                                        $set('jam_selesai', null);
+                                    }
+                                }),
                             TextInput::make('kuota')
                                 ->numeric()
                                 ->required()
                                 ->rules(['min:1']),
                         ])
-                        ->columns(3)
+                        ->columns(4)
                         ->defaultItems(1)
                         ->createItemButtonLabel('Tambah Jadwal Khusus')
-                ])->columns(1),
+                ])->columns(1)
         ];
     }
 

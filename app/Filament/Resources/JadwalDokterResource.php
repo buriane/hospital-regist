@@ -77,20 +77,20 @@ class JadwalDokterResource extends Resource
                                         'label' => "{$dokter->nama_dokter} - {$dokter->poliklinik->nama_poliklinik}"
                                     ])
                             ),
-                        Select::make('hari')
-                            ->label('Hari')
-                            ->options([
-                                'Senin' => 'Senin',
-                                'Selasa' => 'Selasa',
-                                'Rabu' => 'Rabu',
-                                'Kamis' => 'Kamis',
-                                'Jumat' => 'Jumat',
-                                'Sabtu' => 'Sabtu',
-                                'Minggu' => 'Minggu',
-                            ])
-                            ->required(),
-                        Grid::make(2)
+                        Grid::make(4)
                             ->schema([
+                                Select::make('hari')
+                                    ->label('Hari')
+                                    ->options([
+                                        'Senin' => 'Senin',
+                                        'Selasa' => 'Selasa',
+                                        'Rabu' => 'Rabu',
+                                        'Kamis' => 'Kamis',
+                                        'Jumat' => 'Jumat',
+                                        'Sabtu' => 'Sabtu',
+                                        'Minggu' => 'Minggu',
+                                    ])
+                                    ->required(),
                                 TimePicker::make('jam_mulai')
                                     ->required()
                                     ->withoutSeconds()
@@ -110,12 +110,13 @@ class JadwalDokterResource extends Resource
                                             $set('jam_selesai', null);
                                         }
                                     }),
-                            ]),
-                        TextInput::make('kuota')
-                            ->numeric()
-                            ->required()
-                            ->rules(['min:1'])
-                    ])->columns(1),
+                                TextInput::make('kuota')
+                                    ->numeric()
+                                    ->required()
+                                    ->rules(['min:1'])
+                            ])
+                    ])
+                    ->columns(1)
             ]);
     }
 
@@ -157,37 +158,34 @@ class JadwalDokterResource extends Resource
                                     'Minggu' => 'Minggu',
                                 ])
                                 ->required(),
-                            Grid::make(2)
-                                ->schema([
-                                    TimePicker::make('jam_mulai')
-                                        ->required()
-                                        ->withoutSeconds()
-                                        ->reactive(),
-                                    TimePicker::make('jam_selesai')
-                                        ->required()
-                                        ->withoutSeconds()
-                                        ->reactive()
-                                        ->afterOrEqual('jam_mulai')
-                                        ->afterStateUpdated(function ($state, callable $set, $get) {
-                                            if ($state && $get('jam_mulai') && $state <= $get('jam_mulai')) {
-                                                Notification::make()
-                                                    ->danger()
-                                                    ->title('Gagal membuat jadwal dokter')
-                                                    ->body('Jam selesai harus lebih dari jam mulai.')
-                                                    ->send();
-                                                $set('jam_selesai', null);
-                                            }
-                                        }),
-                                ]),
+                            TimePicker::make('jam_mulai')
+                                ->required()
+                                ->withoutSeconds()
+                                ->reactive(),
+                            TimePicker::make('jam_selesai')
+                                ->required()
+                                ->withoutSeconds()
+                                ->reactive()
+                                ->afterOrEqual('jam_mulai')
+                                ->afterStateUpdated(function ($state, callable $set, $get) {
+                                    if ($state && $get('jam_mulai') && $state <= $get('jam_mulai')) {
+                                        Notification::make()
+                                            ->danger()
+                                            ->title('Gagal membuat jadwal dokter')
+                                            ->body('Jam selesai harus lebih dari jam mulai.')
+                                            ->send();
+                                        $set('jam_selesai', null);
+                                    }
+                                }),
                             TextInput::make('kuota')
                                 ->numeric()
                                 ->required()
                                 ->rules(['min:1']),
                         ])
-                        ->columns(3)
+                        ->columns(4)
                         ->defaultItems(1)
                         ->createItemButtonLabel('Tambah Jadwal')
-                ])->columns(1),
+                ])->columns(1)
         ];
     }
 
