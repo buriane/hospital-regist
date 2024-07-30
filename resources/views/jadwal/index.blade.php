@@ -27,7 +27,7 @@
                                 <td class="border border-gray-300 p-2 sm:p-3 text-center whitespace-nowrap">
                                     @php
                                         $tanggalHariIni = $startOfWeek->copy()->addDays(['Senin' => 0, 'Selasa' => 1, 'Rabu' => 2, 'Kamis' => 3, 'Jumat' => 4, 'Sabtu' => 5, 'Minggu' => 6][$hari]);
-                                        $jadwalKhusus = $dokter->jadwalKhususDokters->where('tanggal', $tanggalHariIni->toDateString())->first();
+                                        $jadwalKhusus = $dokter->jadwalKhususDokters->where('tanggal', $tanggalHariIni->toDateString());
                                         $jadwalRegular = $dokter->jadwalDokters->where('hari', $hari);
                                         $sedangCuti = $dokter->cutiDokters->contains(function ($cuti) use ($tanggalHariIni) {
                                             return $tanggalHariIni->between($cuti->tanggal_mulai, $cuti->tanggal_selesai);
@@ -35,8 +35,10 @@
                                     @endphp
                                     @if($sedangCuti)
                                         <span class="ml-2 px-2 py-1 text-sm font-semibold bg-red-500 text-white rounded-full animate-pulse tracking-wider">Cuti</span>
-                                    @elseif($jadwalKhusus)
-                                        {{ date('H:i', strtotime($jadwalKhusus->jam_mulai)) }} - {{ date('H:i', strtotime($jadwalKhusus->jam_selesai)) }}
+                                    @elseif($jadwalKhusus->isNotEmpty())
+                                        @foreach($jadwalKhusus as $khusus)
+                                            {{ date('H:i', strtotime($khusus->jam_mulai)) }} - {{ date('H:i', strtotime($khusus->jam_selesai)) }}<br>
+                                        @endforeach
                                     @elseif($jadwalRegular->isNotEmpty())
                                         @foreach($jadwalRegular->unique(function ($item) {
                                             return $item->jam_mulai . $item->jam_selesai;

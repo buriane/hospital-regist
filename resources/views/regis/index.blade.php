@@ -338,14 +338,16 @@
                             Dokter<span class="text-red-500 ml-1">*</span>
                         </label>
                         <select id="dokter" name="dokter"
-                            class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6"
-                            required>
+                        class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6"
+                        required>
                             <option value="" disabled selected>Pilih Dokter</option>
                             @foreach ($jadwalKhusus as $dokter)
                                 <option value="{{ $dokter->dokter->id_dokter }}"
                                     data-poliklinik="{{ $dokter->dokter->id_poliklinik }}"
                                     data-tanggal="{{ $dokter->tanggal }}"
-                                    data-kuota="{{ $dokter->kuota }}">
+                                    data-kuota="{{ $dokter->kuota }}"
+                                    data-jam-mulai="{{ $dokter->jam_mulai }}"
+                                    data-jam-selesai="{{ $dokter->jam_selesai }}">
                                     {{ $dokter->dokter->nama_dokter }} |
                                     {{ date('H:i', strtotime($dokter->jam_mulai)) }} -
                                     {{ date('H:i', strtotime($dokter->jam_selesai)) }}
@@ -357,7 +359,9 @@
                                 <option value="{{ $dokter->dokter->id_dokter }}"
                                     data-poliklinik="{{ $dokter->dokter->id_poliklinik }}"
                                     data-hari="{{ $dokter->hari }}"
-                                    data-kuota="{{ $dokter->kuota }}">
+                                    data-kuota="{{ $dokter->kuota }}"
+                                    data-jam-mulai="{{ $dokter->jam_mulai }}"
+                                    data-jam-selesai="{{ $dokter->jam_selesai }}">
                                     {{ $dokter->dokter->nama_dokter }} |
                                     {{ date('H:i', strtotime($dokter->jam_mulai)) }} -
                                     {{ date('H:i', strtotime($dokter->jam_selesai)) }}
@@ -365,6 +369,9 @@
                                 </option>
                             @endforeach                        
                         </select>
+
+                        <input type="hidden" name="jam_mulai" id="jam_mulai">
+                        <input type="hidden" name="jam_selesai" id="jam_selesai">
 
                         <div class="w-full sm:w-5/6 flex justify-center space-x-4 mt-4">
                             <button @click="showFormPasienBaru = false" type="button"

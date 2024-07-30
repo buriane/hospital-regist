@@ -112,7 +112,7 @@
                 </div>
                 <div class='info-item'>
                     <div class='info-label'>Jam Praktik</div>
-                    <div class='info-value'>{{ date('H:i', strtotime($jadwal->jam_mulai)) }} - {{ date('H:i', strtotime($jadwal->jam_selesai)) }}</div>
+                    <div class='info-value'>{{ date('H:i', strtotime($jamMulai)) }} - {{ date('H:i', strtotime($jamSelesai)) }}</div>
                 </div>
                 <div class='info-item'>
                     <div class='info-label'>Waktu Kedatangan</div>

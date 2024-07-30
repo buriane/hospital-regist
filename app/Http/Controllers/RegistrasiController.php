@@ -140,6 +140,8 @@ class RegistrasiController extends Controller
             $registrasi->id_poliklinik = $validatedData['poliklinik'];
             $registrasi->id_dokter = $validatedData['dokter'];
             $registrasi->kode_booking = $kode;
+            $registrasi->jam_mulai = $request->jam_mulai;
+            $registrasi->jam_selesai = $request->jam_selesai;
             $registrasi->save();
         } else {
             $registrasi = new Registrasi();
@@ -148,14 +150,21 @@ class RegistrasiController extends Controller
             $registrasi->id_poliklinik = $validatedData['poliklinik'];
             $registrasi->id_dokter = $validatedData['dokter'];
             $registrasi->kode_booking = $kode;
+            $registrasi->jam_mulai = $request->jam_mulai;
+            $registrasi->jam_selesai = $request->jam_selesai;
             $registrasi->save();
         }
 
         $tanggalKunjungan = Carbon::parse($registrasi->tanggal_kunjungan);
         $hariKunjungan = $tanggalKunjungan->locale('id')->dayName;
+
+        $jamMulai = $request->jam_mulai;
+        $jamSelesai = $request->jam_selesai;
     
         $jadwalKhusus = JadwalKhususDokter::where('id_dokter', $registrasi->id_dokter)
             ->whereDate('tanggal', $tanggalKunjungan)
+            ->where('jam_mulai', $jamMulai)
+            ->where('jam_selesai', $jamSelesai)
             ->first();
     
         if ($jadwalKhusus) {
@@ -164,6 +173,8 @@ class RegistrasiController extends Controller
         } else {
             $jadwal = JadwalDokter::where('id_dokter', $registrasi->id_dokter)
                 ->where('hari', $hariKunjungan)
+                ->where('jam_mulai', $jamMulai)
+                ->where('jam_selesai', $jamSelesai)
                 ->first();
             
             if ($jadwal) {
@@ -232,13 +243,16 @@ class RegistrasiController extends Controller
                 ->first();
         }
 
+        $jamMulai = $registrasi->jam_mulai;
+        $jamSelesai = $registrasi->jam_selesai;
+
         $logoPath = public_path('logo.png');
         $logoData = base64_encode(file_get_contents($logoPath));
 
         $dns2d = new DNS2D();
         $qrcode = $dns2d->getBarcodePNG($kode, 'QRCODE', 5, 5);
 
-        $html = view('pdf.bukti-pendaftaran', compact('registrasi', 'kode', 'tanggal', 'jadwal', 'logoData', 'qrcode'))->render();
+        $html = view('pdf.bukti-pendaftaran', compact('registrasi', 'kode', 'tanggal', 'jadwal', 'logoData', 'qrcode', 'jamMulai', 'jamSelesai'))->render();
 
         $pdf = PDF::loadHtml($html);
         $pdf->setPaper('A4', 'portrait');

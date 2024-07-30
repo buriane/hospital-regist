@@ -122,3 +122,18 @@ document.addEventListener("DOMContentLoaded", function() {
         showLoader(); 
     });
 });
+
+// Dokter Selection and jam_mulai/jam_selesai Update
+document.addEventListener("DOMContentLoaded", function() {
+    const dokterSelect = document.getElementById('dokter');
+    const jamMulaiInput = document.getElementById('jam_mulai');
+    const jamSelesaiInput = document.getElementById('jam_selesai');
+
+    if (dokterSelect && jamMulaiInput && jamSelesaiInput) {
+        dokterSelect.addEventListener('change', function() {
+            var selectedOption = this.options[this.selectedIndex];
+            jamMulaiInput.value = selectedOption.getAttribute('data-jam-mulai');
+            jamSelesaiInput.value = selectedOption.getAttribute('data-jam-selesai');
+        });
+    }
+});

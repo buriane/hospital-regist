@@ -18,6 +18,9 @@ return new class extends Migration
             $table->unsignedBigInteger('id_poliklinik');
             $table->unsignedBigInteger('id_dokter');
             $table->string('kode_booking')->unique();
+            $table->unsignedInteger('nomor_urut')->default(1)->nullable();
+            $table->time('jam_mulai')->nullable(); 
+            $table->time('jam_selesai')->nullable(); 
             $table->enum('status', ['Pending', 'Confirmed', 'Canceled'])->default('Pending');
             $table->timestamps();
 
