@@ -38,7 +38,7 @@
                     </tr>
                     @if($hasDoctorSchedules)
                         @foreach($poliklinik->dokter as $dokter)
-                            @foreach($dokter->effectiveSchedule as $jadwal)
+                            @foreach($dokter->effectiveSchedule->sortBy('jam_mulai') as $jadwal)
                                 <tr>
                                     <td class="border border-gray-300 p-2 sm:p-3 pl-10 text-left whitespace-nowrap">{{ $dokter->nama_dokter }}</td>
                                     <td class="border border-gray-300 p-2 sm:p-3 text-center whitespace-nowrap">

@@ -260,25 +260,45 @@ class RegistrasiResource extends Resource
                     ->label('Poliklinik')
                     ->searchable()
                     ->wrap()
-                    ->extraAttributes(['style' => 'width: 200px;']),
+                    ->extraAttributes(['style' => 'width: 150px;']),
                 TextColumn::make('dokter.nama_dokter')
                     ->label('Dokter')
                     ->searchable()
                     ->wrap()
-                    ->extraAttributes(['style' => 'width: 200px;']),
+                    ->extraAttributes(['style' => 'width: 150px;']),
                 TextColumn::make('dokter_schedule')
                     ->label('Jam Praktik')
                     ->searchable()
                     ->getStateUsing(function (Registrasi $record): string {
-                        $hariKunjungan = Carbon::parse($record->tanggal_kunjungan)->locale('id')->dayName;
-                        $jadwal = JadwalDokter::where('id_dokter', $record->id_dokter)
+                        $tanggalKunjungan = $record->tanggal_kunjungan;
+                        $hariKunjungan = Carbon::parse($tanggalKunjungan)->locale('id')->dayName;
+                        $jamMulai = $record->jam_mulai;
+                        $jamSelesai = $record->jam_selesai;
+                        
+                        // Check for special schedule first
+                        $jadwalKhusus = JadwalKhususDokter::where('id_dokter', $record->id_dokter)
+                            ->where('tanggal', $tanggalKunjungan)
+                            ->where('jam_mulai', $jamMulai)
+                            ->where('jam_selesai', $jamSelesai)
+                            ->first();
+                        
+                        if ($jadwalKhusus) {
+                            $jamMulaiFormatted = Carbon::parse($jadwalKhusus->jam_mulai)->format('H:i');
+                            $jamSelesaiFormatted = Carbon::parse($jadwalKhusus->jam_selesai)->format('H:i');
+                            return "{$jamMulaiFormatted} - {$jamSelesaiFormatted}";
+                        }
+                        
+                        // If no special schedule, check regular schedule
+                        $jadwalRegular = JadwalDokter::where('id_dokter', $record->id_dokter)
                             ->where('hari', $hariKunjungan)
+                            ->where('jam_mulai', $jamMulai)
+                            ->where('jam_selesai', $jamSelesai)
                             ->first();
                     
-                        if ($jadwal) {
-                            $jamMulai = Carbon::parse($jadwal->jam_mulai)->format('H:i');
-                            $jamSelesai = Carbon::parse($jadwal->jam_selesai)->format('H:i');
-                            return "{$jamMulai} - {$jamSelesai}";
+                        if ($jadwalRegular) {
+                            $jamMulaiFormatted = Carbon::parse($jadwalRegular->jam_mulai)->format('H:i');
+                            $jamSelesaiFormatted = Carbon::parse($jadwalRegular->jam_selesai)->format('H:i');
+                            return "{$jamMulaiFormatted} - {$jamSelesaiFormatted}";
                         }
                     
                         return 'N/A';
@@ -286,6 +306,9 @@ class RegistrasiResource extends Resource
                 TextColumn::make('kode_booking')
                     ->label('Kode Booking')
                     ->searchable(),
+                TextColumn::make('nomor_urut')
+                    ->label('No Urut')
+                    ->sortable(),
                 TextColumn::make('status')
                     ->label('Status')
                     ->icon(fn (string $state): string => match ($state) {

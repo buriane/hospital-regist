@@ -17,7 +17,12 @@ class Registrasi extends Model
         'id_poliklinik',
         'id_dokter',
         'kode_booking',
+        'nomor_urut',
+        'jam_mulai',
+        'jam_selesai',
         'status',
+        'id_jadwal_dokter',
+        'id_jadwal_khusus_dokter',
     ];
 
     public function dokter()

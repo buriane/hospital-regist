@@ -64,15 +64,15 @@
                         <strong>Kode Booking:</strong>
                     </h1>
 
-                    {{-- QR Code --}}
                     <div class="flex flex-col items-center mb-6 sm:mb-8 md:mb-12">
+                    {{-- QR Code --}}
                         {!! DNS2D::getBarcodeHTML("$kode", 'QRCODE', 5, 5) !!}
                         <h1 class="text-green font-bold text-xl sm:text-2xl mt-4"><strong>{{ $kode }}</strong></h1>
-                    </div>
                     {{-- End QR Code --}}
+                    </div>
 
                     <p class="text-base sm:text-md md:text-lg">
-                        Silakan download bukti pendaftaran dan melakukan daftar ulang di loket pendaftaran,
+                        Silakan <strong class="bg-yellow-200">download bukti</strong> pendaftaran dan melakukan daftar ulang di loket pendaftaran,
                         besok tanggal <strong class="bg-yellow-200">{{ $besok }}</strong> dengan menunjukkan kode
                         booking, <strong class="bg-yellow-200">30 menit</strong> sebelum jadwal praktik.
                         Tidak perlu mencetak/print bukti pendaftaran ini, <strong class="bg-yellow-200">cukup tunjukkan</strong> di layar perangkat Anda kepada petugas loket pendaftaran.
@@ -341,7 +341,7 @@
                         class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6"
                         required>
                             <option value="" disabled selected>Pilih Dokter</option>
-                            @foreach ($jadwalKhusus as $dokter)
+                            @foreach ($jadwalKhusus->sortBy('jam_mulai') as $dokter)
                                 <option value="{{ $dokter->dokter->id_dokter }}"
                                     data-poliklinik="{{ $dokter->dokter->id_poliklinik }}"
                                     data-tanggal="{{ $dokter->tanggal }}"
@@ -355,7 +355,7 @@
                                 </option>
                             @endforeach
                             
-                            @foreach ($jadwal as $dokter)
+                            @foreach ($jadwal->sortBy('jam_mulai') as $dokter)
                                 <option value="{{ $dokter->dokter->id_dokter }}"
                                     data-poliklinik="{{ $dokter->dokter->id_poliklinik }}"
                                     data-hari="{{ $dokter->hari }}"
@@ -376,7 +376,7 @@
                         <div class="w-full sm:w-5/6 flex justify-center space-x-4 mt-4">
                             <button @click="showFormPasienBaru = false" type="button"
                                 class="bg-light-gray text-dark-gray px-4 py-2 rounded-xl border-2 border-blue hover:bg-light-gray/30 hover:text-dark-gray/30 hover:border-blue/30 transition duration-200">Kembali</button>
-                            <button @click="validateForm()" type="submit"
+                            <button @click="validateForm()" type="submit" id="daftar"
                                 class="bg-blue text-white px-4 py-2 rounded-xl hover:bg-blue/50 hover:text-white transition duration-200">
                                 Daftar
                             </button>
@@ -389,7 +389,7 @@
 
     </div>
 
-    <!-- Modal -->
+    <!-- Check Patient Modal -->
     <div x-show="showModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div x-show="showModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
@@ -424,7 +424,7 @@
             </div>
         </div>
     </div>
-    <!-- End Modal -->
+    <!-- End Check Patient Modal -->
 </div>
 @endsection
 
@@ -442,6 +442,8 @@ document.addEventListener("alpine:init", () => {
         const nomor_rm = document.getElementById("nomor_rm");
         const tanggal_lahir = document.getElementById("tanggal_lahir");
         const patientData = document.getElementById("patientData");
+        const email = document.getElementById("email_baru");
+        const no_kartu = document.getElementById("nomor_kartu_baru");
 
         function limitInputLength(event) {
             if (event.target.value.length > 6) {
@@ -449,6 +451,79 @@ document.addEventListener("alpine:init", () => {
             }
         }
         nomor_rm.addEventListener("input", limitInputLength);
+
+        function showModal(message) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-50 overflow-y-auto';
+            modal.innerHTML = `
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <div class="sm:flex sm:items-start">
+                                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                    <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                </div>
+                                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                        Peringatan
+                                    </h3>
+                                    <div class="mt-2">
+                                        <p class="text-sm text-gray-500">
+                                            ${message}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue sm:ml-3 sm:w-auto sm:text-sm">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const closeButton = modal.querySelector('button');
+            closeButton.addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+        }
+
+        function checkEmail(){
+            if(email.value && document.getElementById("id_pasien").value == ''){
+                fetch(`/check-email/${email.value}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data && data.data) {
+                        showModal("Email sudah digunakan, silakan gunakan email lain.");
+                        document.getElementById("daftar").disabled = true;
+                    } else {
+                        document.getElementById("daftar").disabled = false;
+                    }
+                });
+            }
+        }
+
+        function checkNoKartu(){
+            if(no_kartu.value && document.getElementById("id_pasien").value == ''){
+                fetch(`/check-no-kartu/${no_kartu.value}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data && data.data) {
+                        showModal("No. kartu sudah digunakan, silakan gunakan no. kartu lain.");
+                        document.getElementById("daftar").disabled = true;
+                    } else {
+                        document.getElementById("daftar").disabled = false;
+                    }
+                });
+            }
+        }
 
         function checkPatient() {
             if (nomor_rm.value && tanggal_lahir.value) {
@@ -529,6 +604,8 @@ document.addEventListener("alpine:init", () => {
 
         nomor_rm.addEventListener("blur", checkPatient);
         tanggal_lahir.addEventListener("change", checkPatient);
+        email.addEventListener("change", checkEmail);
+        no_kartu.addEventListener("change", checkNoKartu);
         document.getElementById("btn-baru").addEventListener("click", openAll);
     });
 });

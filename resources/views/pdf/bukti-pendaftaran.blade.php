@@ -95,6 +95,10 @@
             </div>
             <div class='info-grid'>
                 <div class='info-item'>
+                    <div class='info-label'>Nomor Urut</div>
+                    <div class='info-value'>{{ $no_urut }}</div>
+                </div>
+                <div class='info-item'>
                     <div class='info-label'>Nama Pasien</div>
                     <div class='info-value'>{{ $registrasi->pasien->nama_pasien }}</div>
                 </div>

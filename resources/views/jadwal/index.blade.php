@@ -36,11 +36,11 @@
                                     @if($sedangCuti)
                                         <span class="ml-2 px-2 py-1 text-sm font-semibold bg-red-500 text-white rounded-full animate-pulse tracking-wider">Cuti</span>
                                     @elseif($jadwalKhusus->isNotEmpty())
-                                        @foreach($jadwalKhusus as $khusus)
+                                        @foreach($jadwalKhusus->sortBy('jam_mulai') as $khusus)
                                             {{ date('H:i', strtotime($khusus->jam_mulai)) }} - {{ date('H:i', strtotime($khusus->jam_selesai)) }}<br>
                                         @endforeach
                                     @elseif($jadwalRegular->isNotEmpty())
-                                        @foreach($jadwalRegular->unique(function ($item) {
+                                        @foreach($jadwalRegular->sortBy('jam_mulai')->unique(function ($item) {
                                             return $item->jam_mulai . $item->jam_selesai;
                                         }) as $item)
                                             {{ date('H:i', strtotime($item->jam_mulai)) }} - {{ date('H:i', strtotime($item->jam_selesai)) }}<br>
