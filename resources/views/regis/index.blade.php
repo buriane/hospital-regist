@@ -13,8 +13,9 @@
 
     <div
         class="bg-light-blue p-4 sm:p-8 rounded-2xl mt-4 sm:mt-8 mx-auto mb-8 sm:mb-16 text-center max-w-[90%] sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl">
-
-        @if (isset($kode)){{-- Progress Bar --}}
+        
+        {{-- Progress Bar --}}
+        @if (isset($kode))
             <div class="flex justify-center items-center mb-3 sm:mb-8 mt-3 sm:mt-8">
                 <div class="flex items-center flex-shrink-0">
                     <div

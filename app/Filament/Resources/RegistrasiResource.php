@@ -301,7 +301,7 @@ class RegistrasiResource extends Resource
                             return "{$jamMulaiFormatted} - {$jamSelesaiFormatted}";
                         }
                     
-                        return 'N/A';
+                        return 'Jadwal dokter telah dihapus';
                     }),
                 TextColumn::make('kode_booking')
                     ->label('Kode Booking')
