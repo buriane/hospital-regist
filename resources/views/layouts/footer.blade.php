@@ -1,5 +1,5 @@
-<footer class="bg-blue py-4 relative overflow-hidden">
-    <div class="container mx-auto flex flex-col items-center sm:items-start relative z-10 mt-8 px-4">
+<footer class="bg-blue py-4 relative overflow-hidden ml-6 mr-6 sm:ml-28 sm:mr-28">
+    <div class="container mx-auto flex flex-col items-center sm:items-start relative z-10 mt-8 px-4 sm:px-8">
         <hr class="w-full border-light-gray">
         <div class="flex flex-col items-center sm:items-start w-full mt-8 mb-8">
             <div class="flex flex-col w-full sm:w-auto sm:mr-auto items-center sm:items-start">
