@@ -69,7 +69,7 @@
                 if ($jadwalRegular) {
                     $jamPraktik = \Carbon\Carbon::parse($jadwalRegular->jam_mulai)->format('H:i') . ' - ' . \Carbon\Carbon::parse($jadwalRegular->jam_selesai)->format('H:i');
                 } else {
-                    $jamPraktik = 'N/A';
+                    $jamPraktik = 'Jadwal dokter telah dihapus';
                 }
             }
         @endphp
