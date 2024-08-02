@@ -339,8 +339,8 @@
                             Dokter<span class="text-red-500 ml-1">*</span>
                         </label>
                         <select id="dokter" name="dokter"
-                        class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6"
-                        required>
+                            class="w-full sm:w-5/6 border-2 border-dark-gray/50 shadow-sm rounded-xl py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue/50 focus:border-transparent mb-6"
+                            required>
                             <option value="" disabled selected>Pilih Dokter</option>
                             @foreach ($jadwalKhusus->sortBy('jam_mulai') as $dokter)
                                 <option value="{{ $dokter->dokter->id_dokter }}"
@@ -348,7 +348,8 @@
                                     data-tanggal="{{ $dokter->tanggal }}"
                                     data-kuota="{{ $dokter->kuota }}"
                                     data-jam-mulai="{{ $dokter->jam_mulai }}"
-                                    data-jam-selesai="{{ $dokter->jam_selesai }}">
+                                    data-jam-selesai="{{ $dokter->jam_selesai }}"
+                                    data-special="true">
                                     {{ $dokter->dokter->nama_dokter }} |
                                     {{ date('H:i', strtotime($dokter->jam_mulai)) }} -
                                     {{ date('H:i', strtotime($dokter->jam_selesai)) }}
@@ -362,7 +363,8 @@
                                     data-hari="{{ $dokter->hari }}"
                                     data-kuota="{{ $dokter->kuota }}"
                                     data-jam-mulai="{{ $dokter->jam_mulai }}"
-                                    data-jam-selesai="{{ $dokter->jam_selesai }}">
+                                    data-jam-selesai="{{ $dokter->jam_selesai }}"
+                                    data-special-dates="{{ json_encode($specialSchedules->filter(function($item) use ($dokter) { return $item->id_dokter == $dokter->id_dokter; })->keys()) }}">
                                     {{ $dokter->dokter->nama_dokter }} |
                                     {{ date('H:i', strtotime($dokter->jam_mulai)) }} -
                                     {{ date('H:i', strtotime($dokter->jam_selesai)) }}

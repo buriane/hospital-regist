@@ -46,22 +46,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateDokterOptions() {
         const selectedPoliklinik = poliklinikSelect.value;
-        const selectedDate = new Date(tanggalInput.value);
-        const selectedDay = getDayName(selectedDate);
+        const selectedDate = tanggalInput.value;
+        const selectedDay = getDayName(new Date(selectedDate));
 
+        // First, hide all options
+        dokterOptions.forEach(option => option.style.display = "none");
+
+        // Show special schedules for the selected date with quota > 0
         dokterOptions.forEach((option) => {
-            const isSpecialSchedule = option.dataset.tanggal === tanggalInput.value;
-
-            if (
+            if (option.dataset.special === "true" && 
+                option.dataset.tanggal === selectedDate && 
                 option.dataset.poliklinik === selectedPoliklinik &&
-                ((option.dataset.hari === selectedDay && !isSpecialSchedule) || isSpecialSchedule) &&
-                parseInt(option.dataset.kuota) > 0
-            ) {
+                parseInt(option.dataset.kuota) > 0) {
                 option.style.display = "";
-            } else {
-                option.style.display = "none";
             }
         });
+
+        // Show regular schedules if there's no special schedule for that specific doctor
+        dokterOptions.forEach((option) => {
+            const specialDates = JSON.parse(option.dataset.specialDates || '[]');
+            if (option.dataset.special !== "true" && 
+                !specialDates.includes(selectedDate + '-' + option.value) &&
+                option.dataset.hari === selectedDay && 
+                option.dataset.poliklinik === selectedPoliklinik && 
+                parseInt(option.dataset.kuota) > 0) {
+                option.style.display = "";
+            }
+        });
+
         dokterSelect.value = "";
     }
 

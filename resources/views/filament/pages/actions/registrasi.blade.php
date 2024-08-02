@@ -44,34 +44,9 @@
         <p><strong>Poliklinik:</strong> {{ $record->poliklinik->nama_poliklinik }}</p>
         <p><strong>Dokter:</strong> {{ $record->dokter->nama_dokter }}</p>
         @php
-            $tanggalKunjungan = $record->tanggal_kunjungan;
-            $hariKunjungan = \Carbon\Carbon::parse($tanggalKunjungan)->locale('id')->dayName;
-            $jamMulai = $record->jam_mulai;
-            $jamSelesai = $record->jam_selesai;
-            
-            // Check for special schedule first
-            $jadwalKhusus = App\Models\JadwalKhususDokter::where('id_dokter', $record->id_dokter)
-                ->where('tanggal', $tanggalKunjungan)
-                ->where('jam_mulai', $jamMulai)
-                ->where('jam_selesai', $jamSelesai)
-                ->first();
-            
-            if ($jadwalKhusus) {
-                $jamPraktik = \Carbon\Carbon::parse($jadwalKhusus->jam_mulai)->format('H:i') . ' - ' . \Carbon\Carbon::parse($jadwalKhusus->jam_selesai)->format('H:i');
-            } else {
-                // If no special schedule, check regular schedule
-                $jadwalRegular = App\Models\JadwalDokter::where('id_dokter', $record->id_dokter)
-                    ->where('hari', $hariKunjungan)
-                    ->where('jam_mulai', $jamMulai)
-                    ->where('jam_selesai', $jamSelesai)
-                    ->first();
-            
-                if ($jadwalRegular) {
-                    $jamPraktik = \Carbon\Carbon::parse($jadwalRegular->jam_mulai)->format('H:i') . ' - ' . \Carbon\Carbon::parse($jadwalRegular->jam_selesai)->format('H:i');
-                } else {
-                    $jamPraktik = 'Jadwal dokter telah dihapus';
-                }
-            }
+            $jamMulaiFormatted = \Carbon\Carbon::parse($record->jam_mulai)->format('H:i');
+            $jamSelesaiFormatted = \Carbon\Carbon::parse($record->jam_selesai)->format('H:i');
+            $jamPraktik = "{$jamMulaiFormatted} - {$jamSelesaiFormatted}";
         @endphp
         <p><strong>Jam Praktik:</strong> {{ $jamPraktik }}</p>
     </div>

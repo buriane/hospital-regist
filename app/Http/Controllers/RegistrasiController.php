@@ -25,28 +25,34 @@ class RegistrasiController extends Controller
         $today = Carbon::now();
         $tomorrow = Carbon::tomorrow();
         
-        // Fetch special schedules
+        // Fetch special schedules with quota > 0
         $jadwalKhusus = JadwalKhususDokter::with(['dokter'])
             ->whereDate('tanggal', '>=', $today)
+            ->where('kuota', '>', 0)
             ->whereDoesntHave('dokter.cutiDokter', function ($query) use ($today, $tomorrow) {
                 $query->where('tanggal_mulai', '<=', $tomorrow)
                         ->where('tanggal_selesai', '>=', $today);
             })
             ->get();
-    
-        // Get doctor IDs with special schedules
-        $specialDoctorIds = $jadwalKhusus->pluck('id_dokter')->toArray();
-        
-        // Fetch regular schedules excluding doctors with special schedules
+
+        // Get all special schedules (including zero quota) for blocking regular schedules of the same doctor
+        $allJadwalKhusus = JadwalKhususDokter::whereDate('tanggal', '>=', $today)->get();
+        $specialSchedules = $allJadwalKhusus->groupBy(function ($item) {
+            return $item->tanggal . '-' . $item->id_dokter;
+        })->map(function ($group) {
+            return $group->first();
+        });
+
+        // Fetch regular schedules
         $jadwal = JadwalDokter::with(['poliklinik', 'dokter'])
+            ->where('kuota', '>', 0)
             ->whereDoesntHave('dokter.cutiDokter', function ($query) use ($today, $tomorrow) {
                 $query->where('tanggal_mulai', '<=', $tomorrow)
                         ->where('tanggal_selesai', '>=', $today);
             })
-            ->whereNotIn('id_dokter', $specialDoctorIds)
             ->get();
             
-        return view('regis.index', compact('polikliniks', 'jadwal', 'jadwalKhusus'));
+        return view('regis.index', compact('polikliniks', 'jadwal', 'jadwalKhusus', 'specialSchedules'));
     }
 
     public function checkPatient(Request $request)

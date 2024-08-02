@@ -270,38 +270,9 @@ class RegistrasiResource extends Resource
                     ->label('Jam Praktik')
                     ->searchable()
                     ->getStateUsing(function (Registrasi $record): string {
-                        $tanggalKunjungan = $record->tanggal_kunjungan;
-                        $hariKunjungan = Carbon::parse($tanggalKunjungan)->locale('id')->dayName;
-                        $jamMulai = $record->jam_mulai;
-                        $jamSelesai = $record->jam_selesai;
-                        
-                        // Check for special schedule first
-                        $jadwalKhusus = JadwalKhususDokter::where('id_dokter', $record->id_dokter)
-                            ->where('tanggal', $tanggalKunjungan)
-                            ->where('jam_mulai', $jamMulai)
-                            ->where('jam_selesai', $jamSelesai)
-                            ->first();
-                        
-                        if ($jadwalKhusus) {
-                            $jamMulaiFormatted = Carbon::parse($jadwalKhusus->jam_mulai)->format('H:i');
-                            $jamSelesaiFormatted = Carbon::parse($jadwalKhusus->jam_selesai)->format('H:i');
-                            return "{$jamMulaiFormatted} - {$jamSelesaiFormatted}";
-                        }
-                        
-                        // If no special schedule, check regular schedule
-                        $jadwalRegular = JadwalDokter::where('id_dokter', $record->id_dokter)
-                            ->where('hari', $hariKunjungan)
-                            ->where('jam_mulai', $jamMulai)
-                            ->where('jam_selesai', $jamSelesai)
-                            ->first();
-                    
-                        if ($jadwalRegular) {
-                            $jamMulaiFormatted = Carbon::parse($jadwalRegular->jam_mulai)->format('H:i');
-                            $jamSelesaiFormatted = Carbon::parse($jadwalRegular->jam_selesai)->format('H:i');
-                            return "{$jamMulaiFormatted} - {$jamSelesaiFormatted}";
-                        }
-                    
-                        return 'Jadwal dokter telah dihapus';
+                        $jamMulaiFormatted = Carbon::parse($record->jam_mulai)->format('H:i');
+                        $jamSelesaiFormatted = Carbon::parse($record->jam_selesai)->format('H:i');
+                        return "{$jamMulaiFormatted} - {$jamSelesaiFormatted}";
                     }),
                 TextColumn::make('kode_booking')
                     ->label('Kode Booking')
