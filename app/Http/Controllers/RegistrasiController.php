@@ -24,16 +24,23 @@ class RegistrasiController extends Controller
         $polikliniks = Poliklinik::all();
         $today = Carbon::now();
         $tomorrow = Carbon::tomorrow();
-        
+
         // Fetch special schedules with quota > 0
-        $jadwalKhusus = JadwalKhususDokter::with(['dokter'])
+        $jadwalKhusus = JadwalKhususDokter::with(['dokter', 'dokter.cutiDokter'])
             ->whereDate('tanggal', '>=', $today)
             ->where('kuota', '>', 0)
-            ->whereDoesntHave('dokter.cutiDokter', function ($query) use ($today, $tomorrow) {
-                $query->where('tanggal_mulai', '<=', $tomorrow)
-                        ->where('tanggal_selesai', '>=', $today);
-            })
             ->get();
+
+            foreach ($jadwalKhusus as $value) {
+                $value->kenaCuti = false;
+
+                foreach($value->dokter->cutiDokter as $value2){
+                    if(Carbon::parse($value->tanggal)->startOfDay() <= Carbon::parse($value2->tanggal_selesai)->startOfDay() && Carbon::parse($value->tanggal)->startOfDay() >= Carbon::parse($value2->tanggal_mulai)->startOfDay() ){
+                        $value->kenaCuti = true;
+                    }
+                }
+            }
+            $jadwalKhusus = $jadwalKhusus->where('kenaCuti', false)->values();
 
         // Get all special schedules (including zero quota) for blocking regular schedules of the same doctor
         $allJadwalKhusus = JadwalKhususDokter::whereDate('tanggal', '>=', $today)->get();
@@ -44,15 +51,38 @@ class RegistrasiController extends Controller
         });
 
         // Fetch regular schedules
-        $jadwal = JadwalDokter::with(['poliklinik', 'dokter'])
+        $jadwal = JadwalDokter::with(['poliklinik', 'dokter', 'dokter.cutiDokter'])
             ->where('kuota', '>', 0)
-            ->whereDoesntHave('dokter.cutiDokter', function ($query) use ($today, $tomorrow) {
-                $query->where('tanggal_mulai', '<=', $tomorrow)
-                        ->where('tanggal_selesai', '>=', $today);
-            })
             ->get();
-            
+
+            foreach ($jadwal as $value) {
+                $value->tanggal = Carbon::today()->next($this->translateDayToEnglish($value->hari));
+                $value->kenaCuti = false;
+
+                foreach($value->dokter->cutiDokter as $value2){
+                    if($value->tanggal <= Carbon::parse($value2->tanggal_selesai)->startOfDay() && $value->tanggal >= Carbon::parse($value2->tanggal_mulai)->startOfDay() ){
+                        $value->kenaCuti = true;
+                    }
+                }
+            }
+            $jadwal = $jadwal->where('kenaCuti', false)->values();
+
         return view('regis.index', compact('polikliniks', 'jadwal', 'jadwalKhusus', 'specialSchedules'));
+    }
+
+    public function translateDayToEnglish($dayInIndonesian)
+    {
+        $days = [
+            'Minggu' => Carbon::SUNDAY,
+            'Senin' => Carbon::MONDAY,
+            'Selasa' => Carbon::TUESDAY,
+            'Rabu' => Carbon::WEDNESDAY,
+            'Kamis' => Carbon::THURSDAY,
+            'Jumat' => Carbon::FRIDAY,
+            'Sabtu' => Carbon::SATURDAY,
+        ];
+
+        return $days[$dayInIndonesian] ?? null;
     }
 
     public function checkPatient(Request $request)
