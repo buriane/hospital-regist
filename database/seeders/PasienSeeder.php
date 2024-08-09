@@ -27,7 +27,7 @@ class PasienSeeder extends Seeder
                 'nomor_kartu' => str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT),
             ],
             [
-                'nomor_rm' => '',
+                'nomor_rm' => '123456',
                 'nama_pasien' => 'Budi Santoso',
                 'tempat_lahir' => 'Bandung',
                 'tanggal_lahir' => '2024-11-30',
