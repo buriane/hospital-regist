@@ -37,50 +37,77 @@ document.addEventListener("DOMContentLoaded", function () {
     const poliklinikSelect = document.getElementById("poliklinik");
     const tanggalInput = document.getElementById("tanggal_kunjungan_baru");
     const dokterSelect = document.getElementById("dokter");
-    const dokterOptions = dokterSelect.querySelectorAll('option:not([value=""])');
+    let dokterOptions;
 
     function getDayName(date) {
         const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         return days[date.getDay()];
     }
 
+    function initializeDokterOptions() {
+        // Store all doctor options in a fragment
+        const fragment = document.createDocumentFragment();
+        dokterOptions = Array.from(dokterSelect.querySelectorAll('option:not([value=""])'));
+        dokterOptions.forEach(option => fragment.appendChild(option));
+
+        // Remove all options except the default one
+        while (dokterSelect.options.length > 1) {
+            dokterSelect.remove(1);
+        }
+
+        // Store the fragment for later use
+        dokterSelect.dokterOptionsFragment = fragment;
+    }
+
     function updateDokterOptions() {
         const selectedPoliklinik = poliklinikSelect.value;
         const selectedDate = tanggalInput.value;
+
+        // Reset doctor select to default state
+        while (dokterSelect.options.length > 1) {
+            dokterSelect.remove(1);
+        }
+
+        // If no poliklinik is selected, don't show any doctors
+        if (!selectedPoliklinik) {
+            return;
+        }
+
         const selectedDay = getDayName(new Date(selectedDate));
 
-        // First, hide all options
-        dokterOptions.forEach(option => option.style.display = "none");
+        // Create a new fragment to hold the filtered options
+        const fragment = document.createDocumentFragment();
 
-        // Show special schedules for the selected date with quota > 0
         dokterOptions.forEach((option) => {
+            const clonedOption = option.cloneNode(true);
             if (option.dataset.special === "true" && 
                 option.dataset.tanggal === selectedDate && 
                 option.dataset.poliklinik === selectedPoliklinik &&
                 parseInt(option.dataset.kuota) > 0) {
-                option.style.display = "";
+                fragment.appendChild(clonedOption);
+            } else {
+                const specialDates = JSON.parse(option.dataset.specialDates || '[]');
+                if (option.dataset.special !== "true" && 
+                    !specialDates.includes(selectedDate + '-' + option.value) &&
+                    option.dataset.hari === selectedDay && 
+                    option.dataset.poliklinik === selectedPoliklinik && 
+                    parseInt(option.dataset.kuota) > 0) {
+                    fragment.appendChild(clonedOption);
+                }
             }
         });
 
-        // Show regular schedules if there's no special schedule for that specific doctor
-        dokterOptions.forEach((option) => {
-            const specialDates = JSON.parse(option.dataset.specialDates || '[]');
-            if (option.dataset.special !== "true" && 
-                !specialDates.includes(selectedDate + '-' + option.value) &&
-                option.dataset.hari === selectedDay && 
-                option.dataset.poliklinik === selectedPoliklinik && 
-                parseInt(option.dataset.kuota) > 0) {
-                option.style.display = "";
-            }
-        });
-
-        dokterSelect.value = "";
+        // Append the filtered options to the select element
+        dokterSelect.appendChild(fragment);
     }
 
     poliklinikSelect.addEventListener("change", updateDokterOptions);
     tanggalInput.addEventListener("change", updateDokterOptions);
 
-    if (tanggalInput.value) {
+    // Initialize dokter options
+    initializeDokterOptions();
+
+    if (tanggalInput.value && poliklinikSelect.value) {
         updateDokterOptions();
     }
 });
